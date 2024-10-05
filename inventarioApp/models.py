@@ -16,6 +16,12 @@ class Usuarios(models.Model):
     password = models.CharField(max_length=128)
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)
+    
+    ROL_CHOICES = [
+        ('jefa', 'Jefa'),
+        ('empleado', 'Empleado'),
+    ]
+    rol = models.CharField(max_length=10, choices=ROL_CHOICES, default='empleado')
 
     def save(self, *args, **kwargs):
         if not self.id:
