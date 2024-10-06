@@ -46,6 +46,8 @@ def login_view(request):
 def inventario_view(request):
     return render(request, 'inventarioApp/inventario.html')
 
+def reports(request):
+    return render(request, 'inventarioApp/reports.html')
 
 def invProduct(request):
     # Obtener la categoría seleccionada desde la URL (GET request)

@@ -12,16 +12,20 @@
   <div class="container mt-5">
     <h1>Bienvenido al Inventario</h1>
     <p>Has iniciado sesión correctamente y ahora estás en la página de inventario.</p>
-    <p>ALex awnao</p>
     <div class="card my-5">
       <div class="card-header">
         <h1>Secciones de mi tienda</h1>
       </div>
       <div class="card-body">
         <div class="row">
-          <div class="col-4 px-3">
+          <div class="col-6 px-3">
             <div class="d-grid">
               <a href="{% url 'invProduct' %}" class="btn btn-primary">Inventario de Productos</a>
+            </div>
+          </div>
+          <div class="col-6 px-3">
+            <div class="d-grid">
+              <a href="{% url 'reports' %}" class="btn btn-primary">Generar Reporte Diario</a>
             </div>
           </div>
         </div>
