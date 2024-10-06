@@ -3,6 +3,7 @@ from .forms import LoginForm
 from .models import Usuarios  
 from django.contrib.auth.hashers import check_password 
 from django.contrib import messages
+from .models import Poleras, Pantalones, Zapatos
 
 def login_view(request):
     if request.method == 'POST':
@@ -50,99 +51,17 @@ def invProduct(request):
     # Obtener la categoría seleccionada desde la URL (GET request)
     categoria_seleccionada = request.GET.get('categoria')
 
-    # Simulación de productos (esto debería ser reemplazado con tu modelo si es que tienes uno)
-    productos = [
-        {
-            'id': 1,
-            'nombre': 'Pantalones de cuero',
-            'color':  'Negro',
-            'talla': 'M',
-            'categoria': 'Pantalones',
-            'precio': 1000,
-            'stock': 6,
-            'imagen': 'https://via.placeholder.com/150/#808080',
-        },
-        {
-            'id': 2,
-            'nombre': 'Pantalones de algodón',
-            'color':  'Negro',
-            'talla': 'M',
-            'categoria': 'Pantalones',
-            'precio': 500,
-            'stock': 0,
-            'imagen': 'https://via.placeholder.com/150/#808080',
-        },
-        {
-            'id': 3,
-            'nombre': 'Pantalones de lona',
-            'color':  'Negro',
-            'talla': 'M',
-            'categoria': 'Pantalones',
-            'precio': 800,
-            'stock': 12,
-            'imagen': 'https://via.placeholder.com/150/#808080',
-        },
-        {
-            'id': 4,
-            'nombre': 'Camiseta de algodón',
-            'color':  'Blanco',
-            'talla': 'M',
-            'categoria': 'Camisetas',
-            'precio': 200,
-            'stock': 15,
-            'imagen': 'https://via.placeholder.com/150/#808080',
-        },
-        {
-            'id': 5,
-            'nombre': 'Camiseta de lona',
-            'color':  'Negro',
-            'talla': 'M',
-            'categoria': 'Camisetas',
-            'precio': 300,
-            'stock': 2,
-            'imagen': 'https://via.placeholder.com/150/#808080',
-        },
-        {
-            'id': 6,
-            'nombre': 'Camiseta de cuero',
-            'color':  'Negro',
-            'talla': 'M',
-            'categoria': 'Camisetas',
-            'precio': 400,
-            'stock': 18,
-            'imagen': 'https://via.placeholder.com/150/#808080',
-        },
-        {
-            'id': 7,
-            'nombre': 'Zapatos de cuero',
-            'color':  'Negro',
-            'talla': 'M',
-            'categoria': 'Zapatos',
-            'precio': 500,
-            'stock': 10,
-            'imagen': 'https://via.placeholder.com/150/#808080',
-        },
-        {
-            'id': 8,
-            'nombre': 'Zapatos de lona',
-            'color':  'Negro',
-            'talla': 'M',
-            'categoria': 'Zapatos',
-            'precio': 600,
-            'stock': 12,
-            'imagen': 'https://via.placeholder.com/150/#808080',
-        },
-        {
-            'id': 9,
-            'nombre': 'Zapatos de algodón',
-            'color':  'Negro',
-            'talla': 'M',
-            'categoria': 'Zapatos',
-            'precio': 700,
-            'stock': 5,
-            'imagen': 'https://via.placeholder.com/150/#808080',
-        },
-    ]
+    # Dependiendo de la categoría seleccionada, obtenemos los productos correspondientes
+    productos = []
+    if categoria_seleccionada == 'Pantalones':
+        productos = Pantalones.objects.all()
+    elif categoria_seleccionada == 'Camisetas':
+        productos = Poleras.objects.all()  # Asumimos que "Camisetas" corresponde a "Poleras"
+    elif categoria_seleccionada == 'Zapatos':
+        productos = Zapatos.objects.all()
+    else:
+        # Si no hay categoría seleccionada, obtenemos todos los productos de todas las categorías
+        productos = list(Poleras.objects.all()) + list(Pantalones.objects.all()) + list(Zapatos.objects.all())
 
     # Si se ha enviado un cambio de stock
     if request.method == 'POST':
@@ -150,18 +69,20 @@ def invProduct(request):
         producto_id = int(request.POST.get('producto_id'))
         nuevo_stock = int(request.POST.get('nuevo_stock'))
 
-        # Actualizar el stock del producto en la lista (debería ser una actualización en la base de datos en un caso real)
-        for producto in productos:
-            if producto['id'] == producto_id:
-                producto['stock'] = nuevo_stock
-                break
+        # Dependiendo de la categoría del producto, actualizamos el stock
+        if categoria_seleccionada == 'Pantalones':
+            producto = Pantalones.objects.get(id=producto_id)
+        elif categoria_seleccionada == 'Camisetas':
+            producto = Poleras.objects.get(id=producto_id)
+        elif categoria_seleccionada == 'Zapatos':
+            producto = Zapatos.objects.get(id=producto_id)
+        
+        # Actualizar el stock en la base de datos
+        producto.stock = nuevo_stock
+        producto.save()
 
         # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
         return redirect('invProduct')
-
-    # Filtrar productos por categoría si se selecciona una categoría
-    if categoria_seleccionada:
-        productos = [producto for producto in productos if producto['categoria'] == categoria_seleccionada]
 
     # Datos que pasamos al template
     data = {
