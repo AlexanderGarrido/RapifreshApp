@@ -22,7 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login_view, name='login'),
     path('inventario/', inventario_view, name='inventario'),
-    path('pantalones/', pantalones, name='pantalones'),
-    path('camisetas/', camisetas, name='camisetas'),
-    path('zapatos/', zapatos, name='zapatos'),
+    path('invProduct/', invProduct, name='invProduct'),
 ]
