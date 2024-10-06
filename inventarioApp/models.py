@@ -11,6 +11,22 @@ class Poleras(models.Model):
     precio = models.IntegerField()
     stock = models.IntegerField()
 
+class Pantalones(models.Model):
+    nombre = models.CharField(max_length=100)
+    color = models.CharField(max_length=100)
+    talla = models.CharField(max_length=50)
+    categoria = models.CharField(max_length=100)
+    precio = models.IntegerField()
+    stock = models.IntegerField()
+
+class Zapatos(models.Model):
+    nombre = models.CharField(max_length=100)
+    color = models.CharField(max_length=100)
+    talla = models.CharField(max_length=50)
+    categoria = models.CharField(max_length=200)
+    precio = models.IntegerField()
+    stock = models.IntegerField()
+
 class Usuarios(models.Model):
     email = models.EmailField(max_length=100, unique=True)
     password = models.CharField(max_length=128)
