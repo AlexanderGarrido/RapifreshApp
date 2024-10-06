@@ -81,9 +81,9 @@
                         <div class="filter-title">Filtrar por Categoría</div>
                         <select name="categoria" class="form-select">
                             <option value="" {% if not categoria_seleccionada %}selected{% endif %}>Todas</option>
-                            <option value="pantalones" {% if categoria_seleccionada == 'pantalones' %}selected{% endif %}>Pantalones</option>
-                            <option value="camisetas" {% if categoria_seleccionada == 'camisetas' %}selected{% endif %}>Camisetas</option>
-                            <option value="zapatos" {% if categoria_seleccionada == 'zapatos' %}selected{% endif %}>Zapatos</option>
+                            <option value="Pantalones" {% if categoria_seleccionada == 'Pantalones' %}selected{% endif %}>Pantalones</option>
+                            <option value="Camisetas" {% if categoria_seleccionada == 'Camisetas' %}selected{% endif %}>Camisetas</option>
+                            <option value="Zapatos" {% if categoria_seleccionada == 'Zapatos' %}selected{% endif %}>Zapatos</option>
                         </select>
                         <div class="filter-option text-center mt-3">
                             <button class="btn btn-primary w-100" type="submit">Aplicar Filtro</button>
@@ -103,20 +103,11 @@
                                     <img src="{{ producto.imagen }}" class="card-img-top fixed-img br-4" alt="{{ producto.nombre }}">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ producto.nombre }}</h5>
+                                        <p class="card-text"><b>Color:</b> {{ producto.color }}</p>
+                                        <p class="card-text"><b>Talla:</b> {{ producto.talla }}</p>
+                                        <p class="card-text"><b>Categoria:</b> {{ producto.categoria }}</p>
                                         <p class="card-text"><b>Precio:</b> ${{ producto.precio }}</p>
-                                        <p class="card-text"><b>Descripción:</b> {{ producto.descripcion }}</p>
                                         <p class="card-text"><b>Stock:</b> {% if producto.stock > 0 %} {{ producto.stock }} {% else %} <span class="text-danger">Sin stock</span> {% endif %}</p>
-
-                                        <!-- Formulario para cambiar stock -->
-                                        <form method="POST" action="{% url 'invProduct' %}?categoria={{ categoria_seleccionada }}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                                            <div class="form-group">
-                                                <label for="nuevo_stock_{{ producto.id }}">Cambiar stock</label>
-                                                <input type="number" name="nuevo_stock" id="nuevo_stock_{{ producto.id }}" class="form-control" value="{{ producto.stock }}" min="0">
-                                            </div>
-                                            <button type="submit" class="btn btn-primary btn-cambiar-stock">Actualizar stock</button>
-                                        </form>
                                     </div>
                                 </div>
                             </div>
