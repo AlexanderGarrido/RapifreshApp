@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  {% load static %}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Inventario</title>
@@ -13,6 +14,10 @@
   <!-- Barra lateral -->
   <div class="d-flex">
     <nav class="bg-dark p-3" style="width: 250px; height: 100vh;">
+      <!-- Logo añadido -->
+      <div class="text-center mb-4">
+        <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid" style="width: 150px; border-radius: 50%;">
+      </div>
       <h2 class="text-center text-white mb-4">AMISTORE</h2>
       <ul class="nav flex-column">
         <li class="nav-item mb-2">
