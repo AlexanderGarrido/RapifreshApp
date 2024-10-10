@@ -22,9 +22,10 @@ def login_view(request):
                     if user.rol == 'jefa':
                         return redirect('inventario')
                     elif user.rol == 'empleado':
-                        return redirect('invProduct')
+                        return redirect('productosEmp')
                     # Si la autenticación es correcta, redirige a la página de inventario
-                    return redirect('inventario')
+                    else:
+                        return redirect('login')
                 else:
                     # Si la contraseña es incorrecta, muestra un mensaje de error
                     messages.error(request, 'Contraseña incorrecta. Inténtalo de nuevo.')
@@ -45,6 +46,9 @@ def login_view(request):
 
 def inventario_view(request):
     return render(request, 'inventarioApp/inventario.html')
+
+def inventario_viewEmp(request):
+    return render(request, 'inventarioApp/inventarioEmp.html')
 
 def reports(request):
     return render(request, 'inventarioApp/reports.html')
@@ -94,3 +98,49 @@ def invProduct(request):
     }
 
     return render(request, 'inventarioApp/productos.html', data)
+
+def invProductEmp(request):
+    # Obtener la categoría seleccionada desde la URL (GET request)
+    categoria_seleccionada = request.GET.get('categoria')
+
+    # Dependiendo de la categoría seleccionada, obtenemos los productos correspondientes
+    productos = []
+    if categoria_seleccionada == 'Pantalones':
+        productos = Pantalones.objects.all()
+    elif categoria_seleccionada == 'Camisetas':
+        productos = Poleras.objects.all()  # Asumimos que "Camisetas" corresponde a "Poleras"
+    elif categoria_seleccionada == 'Zapatos':
+        productos = Zapatos.objects.all()
+    else:
+        # Si no hay categoría seleccionada, obtenemos todos los productos de todas las categorías
+        productos = list(Poleras.objects.all()) + list(Pantalones.objects.all()) + list(Zapatos.objects.all())
+
+    # Si se ha enviado un cambio de stock
+    if request.method == 'POST':
+        # Obtener el ID del producto y el nuevo stock desde el formulario
+        producto_id = int(request.POST.get('producto_id'))
+        nuevo_stock = int(request.POST.get('nuevo_stock'))
+
+        # Dependiendo de la categoría del producto, actualizamos el stock
+        if categoria_seleccionada == 'Pantalones':
+            producto = Pantalones.objects.get(id=producto_id)
+        elif categoria_seleccionada == 'Camisetas':
+            producto = Poleras.objects.get(id=producto_id)
+        elif categoria_seleccionada == 'Zapatos':
+            producto = Zapatos.objects.get(id=producto_id)
+        
+        # Actualizar el stock en la base de datos
+        producto.stock = nuevo_stock
+        producto.save()
+
+        # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
+        return redirect('invProduct')
+
+    # Datos que pasamos al template
+    data = {
+        'seccion': 'invProduct',
+        'productos': productos,
+        'categoria_seleccionada': categoria_seleccionada,  # Para marcar la categoría seleccionada en el filtro
+    }
+
+    return render(request, 'inventarioApp/productosEmp.html', data)

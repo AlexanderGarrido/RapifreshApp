@@ -24,4 +24,6 @@ urlpatterns = [
     path('inventario/', inventario_view, name='inventario'),
     path('invProduct/', invProduct, name='invProduct'),
     path('reports/', reports, name='reports'),
+    path('productosEmp/', invProductEmp, name='productosEmp'),
+    path('inventarioEmp/', inventario_viewEmp, name='inventarioEmp'),
 ]
