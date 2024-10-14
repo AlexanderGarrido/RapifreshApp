@@ -19,13 +19,13 @@ def login_view(request):
                 # Verifica si la contraseña proporcionada es correcta
                 if check_password(password, user.password):
                     #redirigimos al usuario dependiendo de su rol
-                    if user.rol == 'jefa':
+                    if user.rol == 'Jefa':
                         return redirect('inventario')
                     elif user.rol == 'empleado':
                         return redirect('productosEmp')
                     # Si la autenticación es correcta, redirige a la página de inventario
                     else:
-                        return redirect('login')
+                        return redirect('inventario')
                 else:
                     # Si la contraseña es incorrecta, muestra un mensaje de error
                     messages.error(request, 'Contraseña incorrecta. Inténtalo de nuevo.')
