@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import LoginForm
+from .forms import LoginForm 
 from .models import Usuarios  
 from django.contrib.auth.hashers import check_password 
 from django.contrib import messages
@@ -144,3 +144,8 @@ def invProductEmp(request):
     }
 
     return render(request, 'inventarioApp/productosEmp.html', data)
+
+
+def usuario(request):
+    usuarios = Usuarios.objects.all()
+    return render(request, 'inventarioApp/usuarios.html', {'Usuarios': usuarios})
