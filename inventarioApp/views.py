@@ -4,6 +4,8 @@ from .models import Usuarios
 from django.contrib.auth.hashers import check_password 
 from django.contrib import messages
 from .models import Poleras, Pantalones, Zapatos
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
 def login_view(request):
     if request.method == 'POST':
