@@ -24,7 +24,7 @@ def login_view(request):
                     if user.rol == 'Jefa':
                         return redirect('inventario')
                     elif user.rol == 'empleado':
-                        return redirect('productosEmp')
+                        return redirect('inventarioEmp')
                     # Si la autenticación es correcta, redirige a la página de inventario
                     else:
                         return redirect('inventario')
