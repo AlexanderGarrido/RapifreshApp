@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    {% load static %}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Iniciar sesión</title>
@@ -9,73 +10,75 @@
       rel="stylesheet"
     />
   </head>
-  <body class="d-flex  align-items-center vh-100" style="width: 60%; margin: auto;">
-    <div
-      class="container p-4 shadow"
-      style="
-        background-color: #ebbc61;
-        border-radius: 15px;
-      "
-    >
-      <h1 class="text-center">Iniciar sesión</h1>
-
-      <!-- Formulario de inicio de sesión -->
-      <form method="POST" novalidate>
-        {% csrf_token %}
-
-        <!-- Campo de correo -->
-        <div class="mb-3">
-          <label for="email" class="form-label">Correo electrónico</label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            class="form-control {% if form.email.errors %}is-invalid{% endif %}"
-            placeholder="Ingresa tu correo"
-            value="{{ form.email.value|default_if_none:'' }}"
-          />
-          <!-- Mostrar errores debajo del campo -->
-          {% for error in form.email.errors %}
-          <div class="invalid-feedback">{{ error }}</div>
-          {% endfor %}
+  <body class="d-flex align-items-center vh-100" style="width: 60%; margin: auto;">
+    <div class="row w-100" class="container p-4 shadow" style="background-color: #ebbc61; border-radius: 15px;">
+        <div class="col-md-6 d-flex justify-content-center align-items-center">
+          <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid" style="width: 50%; border-radius: 50%;">
         </div>
+        
+        <div class="col-md-6">
+            <div >
+                <h1 class="text-center" style="margin-top: 5%;">Iniciar sesión</h1>
 
-        <!-- Campo de contraseña -->
-        <div class="mb-3">
-          <label for="password" class="form-label">Contraseña</label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            class="form-control {% if form.password.errors %}is-invalid{% endif %}"
-            placeholder="Ingresa tu contraseña"
-          />
-          <!-- Mostrar errores debajo del campo -->
-          {% for error in form.password.errors %}
-          <div class="invalid-feedback">{{ error }}</div>
-          {% endfor %}
-        </div>
+                <!-- Formulario de inicio de sesión -->
+                <form method="POST" novalidate>
+                    {% csrf_token %}
 
-        <!-- Botón para enviar el formulario -->
-        <div style="justify-content: center;">
-          <input
-            type="submit"
-            class="btn btn-primary btn-block"
-            value="Iniciar sesión"
-          />
-        </div>
+                    <!-- Campo de correo -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo electrónico</label>
+                        <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                            placeholder="Ingresa tu correo"
+                            value="{{ form.email.value|default_if_none:'' }}"
+                        />
+                        <!-- Mostrar errores debajo del campo -->
+                        {% for error in form.email.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
 
-        <!-- Mostrar mensajes de error -->
-        {% if messages %}
-        <div class="alert alert-danger mt-3" role="alert">
-          {% for message in messages %}
-          <p class="text-center">{{ message }}</p>
-          {% endfor %}
+                    <!-- Campo de contraseña -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            class="form-control {% if form.password.errors %}is-invalid{% endif %}"
+                            placeholder="Ingresa tu contraseña"
+                        />
+                        <!-- Mostrar errores debajo del campo -->
+                        {% for error in form.password.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Botón para enviar el formulario -->
+                    <div style="justify-content: center; margin-bottom: 10%;">
+                        <input
+                            type="submit"
+                            class="btn btn-primary btn-block"
+                            value="Iniciar sesión"
+                        />
+                    </div>
+
+                    <!-- Mostrar mensajes de error -->
+                    {% if messages %}
+                    <div class="alert alert-danger mt-3" role="alert">
+                        {% for message in messages %}
+                        <p class="text-center">{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
         </div>
-        {% endif %}
-      </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+</body>
 </html>
