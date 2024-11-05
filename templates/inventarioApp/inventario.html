@@ -36,28 +36,36 @@
 
 <body>
   <div class="d-flex">
-    <nav class="bg-dark p-3 sidebar">
+    <nav class="bg-dark p-3 d-flex flex-column" style="width: 250px; height: 100vh;">
       <div class="text-center mb-4">
-        <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid">
+          <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid"
+              style="width: 150px; border-radius: 50%;">
       </div>
       <h2 class="text-center text-white mb-4">AMISTORE</h2>
-      <ul class="nav flex-column">
-        <li class="nav-item mb-2">
-          <a href="{% url 'inventario' %}" class="nav-link text-white"><i class="fa-solid fa-home me-2"></i>Inicio</a>
-        </li>
-        <li class="nav-item mb-2">
-          <a href="{% url 'invProduct' %}" class="nav-link text-white"><i class="fa-solid fa-box me-2"></i>Inventario de Productos</a>
-        </li>
-        <li class="nav-item mb-2">
-          <a href="{% url 'reports' %}" class="nav-link text-white"><i class="fa-solid fa-chart-line me-2"></i>Generar Reporte Diario</a>
-        </li>
+      <ul class="nav flex-column flex-grow-1">
+          <li class="nav-item mb-2">
+              <a href="{% url 'inventario' %}" class="nav-link text-white"><i
+                      class="fa-solid fa-home me-2"></i>Inicio</a>
+          </li>
+          <li class="nav-item mb-2">
+              <a href="{% url 'reports' %}" class="nav-link text-white"><i
+                      class="fa-solid fa-chart-line me-2"></i>Reportes</a>
+          </li>
+          <li class="nav-item mb-2">
+              <a href="{% url 'usuarios' %}" class="nav-link text-white"><i class="fa-solid fa-copy me-2"></i>Administrar Usuarios</a>
+          </li>
       </ul>
-    </nav>
+
+      <ul class="nav flex-column">
+          <li class="nav-item mb-2 ">
+              <a href="{% url 'login' %}" class="nav-link text-white"><i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar Sesión</a>
+          </li>
+      </ul>
+  </nav>
 
     <div class="container-fluid p-4">
       <div class="d-flex justify-content-between align-items-center">
         <h1 class="mb-0">Inicio</h1>
-        <a href="{% url 'login' %}" class="btn btn-primary"><i class="fa-solid fa-right-from-bracket"></i></a>
       </div>
 
       <div class="alert alert-info mt-4" role="alert">
@@ -76,31 +84,11 @@
           </div>
         </div>
         <div class="col-md-6 mb-3">
-          <div class="card text-white bg-success">
-            <div class="card-body text-center">
-              <p>Reportes Diarios</p>
-              <a href="{% url 'reports' %}" class="stretched-link text-white">
-                <i class="fa-solid fa-arrow-right fa-2x"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 mb-3">
           <div class="card text-white bg-warning">
             <div class="card-body text-center">
               <p>Actualizar Inventario</p>
               <a href="{% url 'reports' %}" class="stretched-link text-white">
                 <i class="fa-solid fa-file-alt fa-2x"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 mb-3">
-          <div class="card text-white bg-danger">
-            <div class="card-body text-center">
-              <p>Administrar Usuarios</p>
-              <a href="{% url 'usuarios' %}" class="stretched-link text-white">
-                <i class="fa-solid fa-copy fa-2x"></i>
               </a>
             </div>
           </div>

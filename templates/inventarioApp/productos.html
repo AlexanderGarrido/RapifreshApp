@@ -45,24 +45,29 @@
 
 <body>
     <!-- Barra lateral izquierda -->
-    <nav class="bg-dark p-3" style="width: 250px; height: 100vh;">
+    <nav class="bg-dark p-3 d-flex flex-column" style="width: 250px; height: 100vh;">
         <div class="text-center mb-4">
             <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid"
                 style="width: 150px; border-radius: 50%;">
         </div>
         <h2 class="text-center text-white mb-4">AMISTORE</h2>
-        <ul class="nav flex-column">
+        <ul class="nav flex-column flex-grow-1">
             <li class="nav-item mb-2">
                 <a href="{% url 'inventario' %}" class="nav-link text-white"><i
                         class="fa-solid fa-home me-2"></i>Inicio</a>
             </li>
             <li class="nav-item mb-2">
-                <a href="{% url 'invProduct' %}" class="nav-link text-white"><i
-                        class="fa-solid fa-box me-2"></i>Inventario de Productos</a>
+                <a href="{% url 'reports' %}" class="nav-link text-white"><i
+                        class="fa-solid fa-chart-line me-2"></i>Reportes</a>
             </li>
             <li class="nav-item mb-2">
-                <a href="{% url 'reports' %}" class="nav-link text-white"><i
-                        class="fa-solid fa-chart-line me-2"></i>Generar Reporte Diario</a>
+                <a href="{% url 'usuarios' %}" class="nav-link text-white"><i class="fa-solid fa-copy me-2"></i>Administrar Usuarios</a>
+            </li>
+        </ul>
+
+        <ul class="nav flex-column">
+            <li class="nav-item mb-2 ">
+                <a href="{% url 'login' %}" class="nav-link text-white"><i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar Sesión</a>
             </li>
         </ul>
     </nav>
@@ -109,6 +114,9 @@
                     {% endif %}
                 </tbody>
             </table>
+            <div class="d-flex justify-content-initial mb-2 mt-4 ms-2">
+                <a href="{% url 'inventario' %}" class="btn btn-danger"><i class="fa-solid fa-arrow-left"></i> Volver</a>
+            </div>
         </div>
     </div>
 
