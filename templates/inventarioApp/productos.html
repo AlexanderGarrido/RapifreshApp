@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -93,11 +93,13 @@
                         <th scope="col">Categoria</th>
                         <th scope="col">Precio</th>
                         <th scope="col">Stock</th>
+                        <th scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if productos %}
                     {% for producto in productos %}
+                    product = producto.precio
                     <tr class="table-light">
                         <th scope="row">{{ producto.nombre }}</th>
                         <td>{{ producto.color }}</td>
@@ -105,6 +107,11 @@
                         <td>{{ producto.categoria }}</td>
                         <td>{{ producto.precio }}</td>
                         <td>{{ producto.stock }}</td>
+                        <td style="text-align: center;">
+                            <button style="background-color: green; border: none; border-radius: 5px;"><i class="fa-solid fa-add"></i></button>
+                            <button style="background-color: red; border: none; border-radius: 5px;"><i class="fa-solid fa-minus"></i></button>
+                            <button style=" border-radius: 5px;"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
                     </tr>
                     {% endfor %}
                     {% else %}
