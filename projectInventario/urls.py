@@ -21,10 +21,10 @@ from inventarioApp.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login_view, name='login'),
-    path('inventario/', inventario_view, name='inventario'),
-    path('invProduct/', invProduct, name='invProduct'),
+    path('inicio/', inventario_view, name='inicio'),
+    path('inventario/', inventario, name='inventario'),
     path('reports/', reports, name='reports'),
-    path('productosEmp/', invProductEmp, name='productosEmp'),
-    path('inventarioEmp/', inventario_viewEmp, name='inventarioEmp'),
+    path('inventarioEmp/', inventarioEmp, name='inventarioEmp'),
+    path('inicioEmp/', inventario_viewEmp, name='inicioEmp'),
     path('usuarios/', usuario, name='usuarios'),
 ]

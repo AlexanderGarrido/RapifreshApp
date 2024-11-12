@@ -22,12 +22,12 @@ def login_view(request):
                 if check_password(password, user.password):
                     #redirigimos al usuario dependiendo de su rol
                     if user.rol == 'Jefa':
-                        return redirect('inventario')
+                        return redirect('inicio')
                     elif user.rol == 'empleado':
-                        return redirect('inventarioEmp')
+                        return redirect('inicioEmp')
                     # Si la autenticación es correcta, redirige a la página de inventario
                     else:
-                        return redirect('inventario')
+                        return redirect('inicio')
                 else:
                     # Si la contraseña es incorrecta, muestra un mensaje de error
                     messages.error(request, 'Contraseña incorrecta. Inténtalo de nuevo.')
@@ -47,15 +47,15 @@ def login_view(request):
 
 
 def inventario_view(request):
-    return render(request, 'inventarioApp/inventario.html')
+    return render(request, 'inventarioApp/inicio.html')
 
 def inventario_viewEmp(request):
-    return render(request, 'inventarioApp/inventarioEmp.html')
+    return render(request, 'inventarioApp/inicioEmp.html')
 
 def reports(request):
     return render(request, 'inventarioApp/reports.html')
 
-def invProduct(request):
+def inventario(request):
     # Obtener la categoría seleccionada desde la URL (GET request)
     categoria_seleccionada = request.GET.get('categoria')
 
@@ -90,18 +90,18 @@ def invProduct(request):
         producto.save()
 
         # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
-        return redirect('invProduct')
+        return redirect('inventario')
 
     # Datos que pasamos al template
     data = {
-        'seccion': 'invProduct',
+        'seccion': 'inventario',
         'productos': productos,
         'categoria_seleccionada': categoria_seleccionada,  # Para marcar la categoría seleccionada en el filtro
     }
 
-    return render(request, 'inventarioApp/productos.html', data)
+    return render(request, 'inventarioApp/inventario.html', data)
 
-def invProductEmp(request):
+def inventarioEmp(request):
     # Obtener la categoría seleccionada desde la URL (GET request)
     categoria_seleccionada = request.GET.get('categoria')
 
@@ -136,16 +136,16 @@ def invProductEmp(request):
         producto.save()
 
         # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
-        return redirect('invProduct')
+        return redirect('inventario')
 
     # Datos que pasamos al template
     data = {
-        'seccion': 'invProduct',
+        'seccion': 'inventario',
         'productos': productos,
         'categoria_seleccionada': categoria_seleccionada,  # Para marcar la categoría seleccionada en el filtro
     }
 
-    return render(request, 'inventarioApp/productosEmp.html', data)
+    return render(request, 'inventarioApp/inventarioEmp.html', data)
 
 
 def usuario(request):
