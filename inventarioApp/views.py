@@ -227,11 +227,11 @@ def ajustarStock(request, producto_id):
 
   # Asegúrate de que el modelo de Producto está importado
 
-def modificarProducto(request, product_id):
+def modificarProducto(request, producto_id):
     if request.method == 'POST':
         try:
             # Obtener el producto por ID usando el modelo correcto
-            producto = get_object_or_404(Productos, id=product_id)
+            producto = get_object_or_404(Productos, id=producto_id)
 
             # Capturar los datos enviados en la solicitud
             nombre = request.POST.get('nombre')
