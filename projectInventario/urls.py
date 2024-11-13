@@ -27,4 +27,5 @@ urlpatterns = [
     path('inventarioEmp/', inventarioEmp, name='inventarioEmp'),
     path('inicioEmp/', inventario_viewEmp, name='inicioEmp'),
     path('usuarios/', usuario, name='usuarios'),
+    path('agregarProducto/', agregarProducto, name='agregarProducto'),
 ]

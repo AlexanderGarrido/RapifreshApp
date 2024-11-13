@@ -4,19 +4,12 @@ from django.contrib import admin
 
 from inventarioApp.models import *
 
-class PolerasAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'color', 'talla', 'categoria', 'precio', 'stock')
 
-class PantalonesAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'color', 'talla', 'categoria', 'precio', 'stock')
-
-class ZapatosAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'color', 'talla', 'categoria', 'precio', 'stock')
+class ProductosAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'descripcion', 'color', 'talla', 'categoria', 'precio', 'stock')
 
 class UsuariosAdmin(admin.ModelAdmin):
     list_display = ('email', 'nombre', 'apellido', 'rol')
 
 admin.site.register(Usuarios, UsuariosAdmin)
-admin.site.register(Poleras, PolerasAdmin)
-admin.site.register(Pantalones, PantalonesAdmin)
-admin.site.register(Zapatos, ZapatosAdmin)
+admin.site.register(Productos, ProductosAdmin)

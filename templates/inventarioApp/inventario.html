@@ -107,7 +107,8 @@
                         <td>{{ producto.precio }}</td>
                         <td>{{ producto.stock }}</td>
                         <td style="text-align: center;">
-                            <button style="background-color: green; border: none; border-radius: 5px;"><i class="fa-solid fa-add"></i></button>
+                            <a href="{% url 'agregarProducto' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i></a>
+                            
                             <button style="background-color: red; border: none; border-radius: 5px;"><i class="fa-solid fa-minus"></i></button>
                             <button style=" border-radius: 5px;"><i class="fa-solid fa-trash-can"></i></button>
                         </td>

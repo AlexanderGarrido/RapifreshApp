@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
-from .forms import LoginForm 
+from .forms import LoginForm, productosForm
 from .models import Usuarios  
 from django.contrib.auth.hashers import check_password 
 from django.contrib import messages
-from .models import Poleras, Pantalones, Zapatos
+from .models import Productos
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 
@@ -62,14 +62,14 @@ def inventario(request):
     # Dependiendo de la categoría seleccionada, obtenemos los productos correspondientes
     productos = []
     if categoria_seleccionada == 'Pantalones':
-        productos = Pantalones.objects.all()
+        productos = Productos.objects.all()
     elif categoria_seleccionada == 'Camisetas':
-        productos = Poleras.objects.all()  # Asumimos que "Camisetas" corresponde a "Poleras"
+        productos = Productos.objects.all()  # Asumimos que "Camisetas" corresponde a "Poleras"
     elif categoria_seleccionada == 'Zapatos':
-        productos = Zapatos.objects.all()
+        productos = Productos.objects.all()
     else:
         # Si no hay categoría seleccionada, obtenemos todos los productos de todas las categorías
-        productos = list(Poleras.objects.all()) + list(Pantalones.objects.all()) + list(Zapatos.objects.all())
+        productos = list(Productos.objects.all())
 
     # Si se ha enviado un cambio de stock
     if request.method == 'POST':
@@ -79,11 +79,11 @@ def inventario(request):
 
         # Dependiendo de la categoría del producto, actualizamos el stock
         if categoria_seleccionada == 'Pantalones':
-            producto = Pantalones.objects.get(id=producto_id)
+            producto = Productos.objects.get(id=producto_id)
         elif categoria_seleccionada == 'Camisetas':
-            producto = Poleras.objects.get(id=producto_id)
+            producto = Productos.objects.get(id=producto_id)
         elif categoria_seleccionada == 'Zapatos':
-            producto = Zapatos.objects.get(id=producto_id)
+            producto = Productos.objects.get(id=producto_id)
         
         # Actualizar el stock en la base de datos
         producto.stock = nuevo_stock
@@ -108,14 +108,14 @@ def inventarioEmp(request):
     # Dependiendo de la categoría seleccionada, obtenemos los productos correspondientes
     productos = []
     if categoria_seleccionada == 'Pantalones':
-        productos = Pantalones.objects.all()
+        productos = Productos.objects.all()
     elif categoria_seleccionada == 'Camisetas':
-        productos = Poleras.objects.all()  # Asumimos que "Camisetas" corresponde a "Poleras"
+        productos = Productos.objects.all()  # Asumimos que "Camisetas" corresponde a "Poleras"
     elif categoria_seleccionada == 'Zapatos':
-        productos = Zapatos.objects.all()
+        productos = Productos.objects.all()
     else:
         # Si no hay categoría seleccionada, obtenemos todos los productos de todas las categorías
-        productos = list(Poleras.objects.all()) + list(Pantalones.objects.all()) + list(Zapatos.objects.all())
+        productos = list(Productos.objects.all())
 
     # Si se ha enviado un cambio de stock
     if request.method == 'POST':
@@ -125,11 +125,11 @@ def inventarioEmp(request):
 
         # Dependiendo de la categoría del producto, actualizamos el stock
         if categoria_seleccionada == 'Pantalones':
-            producto = Pantalones.objects.get(id=producto_id)
+            producto = Productos.objects.get(id=producto_id)
         elif categoria_seleccionada == 'Camisetas':
-            producto = Poleras.objects.get(id=producto_id)
+            producto = Productos.objects.get(id=producto_id)
         elif categoria_seleccionada == 'Zapatos':
-            producto = Zapatos.objects.get(id=producto_id)
+            producto = Productos.objects.get(id=producto_id)
         
         # Actualizar el stock en la base de datos
         producto.stock = nuevo_stock
@@ -151,3 +151,14 @@ def inventarioEmp(request):
 def usuario(request):
     usuarios = Usuarios.objects.all()
     return render(request, 'inventarioApp/usuarios.html', {'Usuarios': usuarios})
+
+
+def agregarProducto(request):
+    form = productosForm()
+    if request.method == 'POST':
+        form = productosForm(request.POST)
+        if form.is_valid():
+            Productos.objects.create(nombre=form.cleaned_data['nombre'], descripcion=form.cleaned_data['descripcion'], color=form.cleaned_data['color'], talla=form.cleaned_data['talla'], categoria=form.cleaned_data['categoria'], precio=form.cleaned_data['precio'], stock=form.cleaned_data['stock'])
+            return HttpResponseRedirect(reverse('inventario'))
+    data = {'form': form}
+    return render(request, 'inventarioApp/agregarProducto.html', data)

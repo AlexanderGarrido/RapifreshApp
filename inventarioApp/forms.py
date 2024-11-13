@@ -22,3 +22,12 @@ class LoginForm(forms.Form):
             'max_length': 'La contraseña no debe tener más de 6 caracteres.'
         }
     )
+
+class productosForm(forms.Form):
+    nombre = forms.CharField(max_length=100)
+    descripcion = forms.CharField(max_length=200)
+    color = forms.CharField(max_length=100)
+    talla = forms.CharField(max_length=50)
+    categoria = forms.CharField(max_length=100)
+    precio = forms.IntegerField()    
+    stock = forms.IntegerField()
