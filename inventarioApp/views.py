@@ -190,7 +190,7 @@ def agregarProducto(request):
                 accion="Agregar"  # Tipo de acción
             )
 
-            return HttpResponseRedirect(reverse('inventarioEmp'))
+            return HttpResponseRedirect(reverse('inventario'))
     data = {'form': form}
     return render(request, 'inventarioApp/agregarProducto.html', data)
 
@@ -224,3 +224,44 @@ def ajustarStock(request, producto_id):
         return JsonResponse({"status": "success", "new_stock": producto.stock})
     
     return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
+
+  # Asegúrate de que el modelo de Producto está importado
+
+def modificarProducto(request, product_id):
+    if request.method == 'POST':
+        try:
+            # Obtener el producto por ID usando el modelo correcto
+            producto = get_object_or_404(Productos, id=product_id)
+
+            # Capturar los datos enviados en la solicitud
+            nombre = request.POST.get('nombre')
+            descripcion = request.POST.get('descripcion')
+            color = request.POST.get('color')
+            talla = request.POST.get('talla')
+            categoria = request.POST.get('categoria')
+            precio = request.POST.get('precio')
+            nuevo_stock = request.POST.get('nuevo_stock')
+            
+            # Mensajes de depuración
+            print(f"Datos recibidos: Nombre: {nombre}, Descripción: {descripcion}, Color: {color}, Talla: {talla}, Categoria: {categoria}, Precio: {precio}, Stock: {nuevo_stock}")
+
+            # Validar que los datos no están vacíos
+            producto.nombre = nombre or producto.nombre
+            producto.descripcion = descripcion or producto.descripcion
+            producto.color = color or producto.color
+            producto.talla = talla or producto.talla
+            producto.categoria = categoria or producto.categoria
+            producto.precio = float(precio) if precio else producto.precio
+
+            if nuevo_stock:
+                producto.stock = int(nuevo_stock)  # Convertir a entero
+
+            # Guardar cambios en la base de datos
+            producto.save()
+
+            return JsonResponse({'success': True})
+        except Exception as e:
+            print(f"Error al actualizar el producto: {e}")
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)

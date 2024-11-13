@@ -29,4 +29,5 @@ urlpatterns = [
     path('usuarios/', usuario, name='usuarios'),
     path('agregarProducto/', agregarProducto, name='agregarProducto'),
     path('ajustarStock/<int:producto_id>/', ajustarStock, name='ajustarStock'),
+    path('modificarProducto/<int:producto_id>/', modificarProducto, name='modificarProducto'),
 ]

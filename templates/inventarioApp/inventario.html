@@ -1,305 +1,459 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     {% load static %}
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Mi Tienda 😁</title>
     <!-- CSS de BS5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
     <!-- CSS DATATABLE -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
     <style>
-        /* Estilos para la navegación */
-        body {
-            display: flex;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #ffe9cc;;
-        }
+      /* Estilos para la navegación */
+      body {
+        display: flex;
+        min-height: 100vh;
+        margin: 0;
+        background-color: #ffe9cc;
+      }
 
-        .bg-dark {
-            width: 250px;
-            height: 100vh;
-        }
+      .bg-dark {
+        width: 250px;
+        height: 100vh;
+      }
 
-        .container-content {
-            flex-grow: 1;
-            padding: 2rem;
-            width: 100%;
-        }
+      .container-content {
+        flex-grow: 1;
+        padding: 2rem;
+        width: 100%;
+      }
 
-        /* Estilos para la tabla */
-        .table-responsive {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+      /* Estilos para la tabla */
+      .table-responsive {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
 
-        .table {
-            margin-top: 1rem;
-        }
+      .table {
+        margin-top: 1rem;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <!-- Barra lateral izquierda -->
-    <nav class="bg-dark p-3 d-flex flex-column" style="width: 250px; height: 100vh;">
-        <div class="text-center mb-4">
-            <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid"
-                style="width: 150px; border-radius: 50%;">
-        </div>
-        <h2 class="text-center text-white mb-4">AMISTORE</h2>
-        <ul class="nav flex-column flex-grow-1">
-            <li class="nav-item mb-2">
-                <a href="{% url 'inicio' %}" class="nav-link text-white"><i
-                        class="fa-solid fa-home me-2"></i>Inicio</a>
-            </li>
-            <li class="nav-item mb-2">
-                <a href="{% url 'reports' %}" class="nav-link text-white"><i
-                        class="fa-solid fa-chart-line me-2"></i>Reportes</a>
-            </li>
-            <li class="nav-item mb-2">
-                <a href="{% url 'usuarios' %}" class="nav-link text-white"><i class="fa-solid fa-copy me-2"></i>Administrar Usuarios</a>
-            </li>
-        </ul>
+    <nav
+      class="bg-dark p-3 d-flex flex-column"
+      style="width: 250px; height: 100vh"
+    >
+      <div class="text-center mb-4">
+        <img
+          src="{% static 'img/logo.jpg' %}"
+          alt="Logo AmiStore"
+          class="img-fluid"
+          style="width: 150px; border-radius: 50%"
+        />
+      </div>
+      <h2 class="text-center text-white mb-4">AMISTORE</h2>
+      <ul class="nav flex-column flex-grow-1">
+        <li class="nav-item mb-2">
+          <a href="{% url 'inicio' %}" class="nav-link text-white"
+            ><i class="fa-solid fa-home me-2"></i>Inicio</a
+          >
+        </li>
+        <li class="nav-item mb-2">
+          <a href="{% url 'reports' %}" class="nav-link text-white"
+            ><i class="fa-solid fa-chart-line me-2"></i>Reportes</a
+          >
+        </li>
+        <li class="nav-item mb-2">
+          <a href="{% url 'usuarios' %}" class="nav-link text-white"
+            ><i class="fa-solid fa-copy me-2"></i>Administrar Usuarios</a
+          >
+        </li>
+      </ul>
 
-        <ul class="nav flex-column">
-            <li class="nav-item mb-2 ">
-                <a href="{% url 'login' %}" class="nav-link text-white"><i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar Sesión</a>
-            </li>
-        </ul>
+      <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+          <a href="{% url 'login' %}" class="nav-link text-white"
+            ><i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar Sesión</a
+          >
+        </li>
+      </ul>
     </nav>
 
     <!-- Contenedor Principal -->
     <div class="container-content">
-        <div class="d-flex justify-content-between align-items-center">
-            <h1 class="mb-0">Gestion de Inventario</h1>
-        </div>
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="mb-0">Gestion de Inventario</h1>
+      </div>
 
-        <div class="alert alert-info mt-4" role="alert">
-            <i class="fa-solid fa-info-circle"></i> Bienvenido a la gestión de inventario.
-        </div>
+      <div class="alert alert-info mt-4" role="alert">
+        <i class="fa-solid fa-info-circle"></i> Bienvenido a la gestión de
+        inventario.
+      </div>
 
-        <div style="flex: auto; text-align: end;">
-            <a href="{% url 'agregarProducto' %}" class="btn btn-primary">
-                <i class="fa-solid fa-plus"></i>
-                 Agregar Producto
-            </a>
-        </div>
+      <div style="flex: auto; text-align: end">
+        <a href="{% url 'agregarProducto' %}" class="btn btn-primary">
+          <i class="fa-solid fa-plus"></i>
+          Agregar Producto
+        </a>
+      </div>
 
-        <!-- Tabla estilo DataTables -->
-        <div class="table-responsive">
-            <table id="example" class="table table-striped table-bordered" style="width: 100%">
-                <thead>
-                    <tr class="table-primary">
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Color</th>
-                        <th scope="col">Talla</th>
-                        <th scope="col">Categoria</th>
-                        <th scope="col">Precio</th>
-                        <th scope="col">Stock</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if productos %}
-                    {% for producto in productos %}
-                    <tr class="table-light">
-                        <th scope="row">{{ producto.nombre }}</th>
-                        <td>{{ producto.color }}</td>
-                        <td>{{ producto.talla }}</td>
-                        <td>{{ producto.categoria }}</td>
-                        <td>{{ producto.precio }}</td>
-                        <td>{{ producto.stock }}</td>
-                        <td style="text-align: center;">
-                            <button  data-bs-toggle="modal" data-bs-target="#addProductModal" class="add-button btn btn-primary" data-id="{{ producto.id }}">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button style="border-radius: 5px;" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" class="delete-button" data-id="{{ producto.id }}">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center">No hay productos registrados</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-initial mb-2 mt-4 ms-2">
-                <a href="{% url 'inicio' %}" class="btn btn-danger"><i class="fa-solid fa-arrow-left"></i> Volver</a>
-            </div>
+      <!-- Tabla estilo DataTables -->
+      <div class="table-responsive">
+        <table
+          id="example"
+          class="table table-striped table-bordered"
+          style="width: 100%"
+        >
+          <thead>
+            <tr class="table-primary">
+              <th scope="col">Nombre</th>
+              <th scope="col">Descripción</th>
+              <th scope="col">Color</th>
+              <th scope="col">Talla</th>
+              <th scope="col">Categoria</th>
+              <th scope="col">Precio</th>
+              <th scope="col">Stock</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if productos %} {% for producto in productos %}
+            <tr class="table-light">
+              <th scope="row">{{ producto.nombre }}</th>
+              <td>{{ producto.descripcion }}</td>
+              <td>{{ producto.color }}</td>
+              <td>{{ producto.talla }}</td>
+              <td>{{ producto.categoria }}</td>
+              <td>{{ producto.precio }}</td>
+              <td>{{ producto.stock }}</td>
+              <td style="text-align: center">
+                <button
+                  data-bs-toggle="modal"
+                  data-bs-target="#addProductModal"
+                  class="add-button btn btn-primary"
+                  data-id="{{ producto.id }}"
+                >
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button
+                  style="border-radius: 5px"
+                  data-bs-toggle="modal"
+                  data-bs-target="#confirmDeleteModal"
+                  class="delete-button"
+                  data-id="{{ producto.id }}"
+                >
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </td>
+            </tr>
+            {% endfor %} {% else %}
+            <tr>
+              <td colspan="6" class="text-center">
+                No hay productos registrados
+              </td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+        <div class="d-flex justify-content-initial mb-2 mt-4 ms-2">
+          <a href="{% url 'inicio' %}" class="btn btn-danger"
+            ><i class="fa-solid fa-arrow-left"></i> Volver</a
+          >
         </div>
+      </div>
     </div>
     <!-- Modal de Agregar Producto -->
-    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addProductModalLabel">Modificar stock</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div
+      class="modal fade"
+      id="addProductModal"
+      tabindex="-1"
+      aria-labelledby="addProductModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addProductModalLabel">
+              Modificar stock
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form
+              method="post"
+              class="col-12 border border-info rounded p-4"
+              id="addProductForm"
+            >
+              {% csrf_token %}
+              <input type="hidden" id="productId" name="product_id" />
+              <div class="mb-3 row">
+                <div class="mb-3 row">
+                  <label for="productName" class="col-sm-4 col-form-label">Nombre</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="productName" name="nombre" />
+                  </div>
                 </div>
-                <div class="modal-body">
-                    <form method="post" class="col-12 border border-info rounded p-4" id="addProductForm">
-                        {% csrf_token %}
-                        <div class="mb-3 row">
-                            <label for="productName" class="col-sm-4 col-form-label">Nombre</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="productName" name="nombre"  >
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="productColor" class="col-sm-4 col-form-label">Color</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="productColor" name="color"  >
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="productSize" class="col-sm-4 col-form-label">Talla</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="productSize" name="talla"  >
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="productCategory" class="col-sm-4 col-form-label">Categoría</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="productCategory" name="categoria"  >
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="productPrice" class="col-sm-4 col-form-label">Precio</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="productPrice" name="precio" >
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="productStock" class="col-sm-4 col-form-label">Stock actual</label>
-                            <div class="col-sm-8">
-                                <input type="number" class="form-control" id="productStock" name="stock" disabled readonly>
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="productModificar" class="col-sm-4 col-form-label" style="font-weight: bold;">Nuevo stock</label>
-                            <div class="col-sm-8">
-                                <input type="number" class="form-control" id="productModificar" name="stock">
-                            </div>
-                        </div>
-                    </form>
+      
+                <!-- Campo de Descripción -->
+                <div class="mb-3 row">
+                  <label for="productDescripcion" class="col-sm-4 col-form-label">Descripción</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="productDescripcion" name="descripcion" />
+                  </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="addProductButton">Guardar</button>
+      
+                <!-- Resto de los campos -->
+                <div class="mb-3 row">
+                  <label for="productColor" class="col-sm-4 col-form-label">Color</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="productColor" name="color" />
+                  </div>
                 </div>
-            </div>
+              <div class="mb-3 row">
+                <label for="productSize" class="col-sm-4 col-form-label"
+                  >Talla</label
+                >
+                <div class="col-sm-8">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="productSize"
+                    name="talla"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label for="productCategory" class="col-sm-4 col-form-label"
+                  >Categoría</label
+                >
+                <div class="col-sm-8">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="productCategory"
+                    name="categoria"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label for="productPrice" class="col-sm-4 col-form-label"
+                  >Precio</label
+                >
+                <div class="col-sm-8">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="productPrice"
+                    name="precio"
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label for="productStock" class="col-sm-4 col-form-label"
+                  >Stock actual</label
+                >
+                <div class="col-sm-8">
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="productStock"
+                    name="stock"
+                    disabled
+                    readonly
+                  />
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label
+                  for="productModificar"
+                  class="col-sm-4 col-form-label"
+                  style="font-weight: bold"
+                  >Nuevo stock</label
+                >
+                <div class="col-sm-8">
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="productModificar"
+                    name="stock"
+                  />
+                </div>
+              </div>
+            </form>
+            <input type="hidden" id="csrfToken" value="{{ csrf_token }}" />
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" id="addProductButton">
+              Guardar
+            </button>
+          </div>
         </div>
+      </div>
     </div>
     <!-- Modal de Confirmación -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Estás seguro de que deseas eliminar este producto?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">Eliminar</button>
-                </div>
-            </div>
+    <div
+      class="modal fade"
+      id="confirmDeleteModal"
+      tabindex="-1"
+      aria-labelledby="confirmDeleteModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmDeleteModalLabel">
+              Confirmar Eliminación
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            ¿Estás seguro de que deseas eliminar este producto?
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              id="confirmDeleteButton"
+            >
+              Eliminar
+            </button>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- JS de BS5 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
     <!-- JS DATATABLE -->
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
     <script>
-        $(document).ready(function () {
-            $('#example').DataTable({
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json'
-                },
-                pageLength: 10,
-                lengthMenu: [5, 10, 25, 50]
-            });
+      $(document).ready(function () {
+        $("#example").DataTable({
+          language: {
+            url: "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json",
+          },
+          pageLength: 10,
+          lengthMenu: [5, 10, 25, 50],
         });
+      });
     </script>
     <!--ENVIAR LOS DATOS DEL PRODUCTO AL MODAL DE EDITAR-->
     <script>
-        $(document).ready(function () {
-            // Inicializar DataTable
-            $('Productos').DataTable({
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json'
-                },
-                pageLength: 10,
-                lengthMenu: [5, 10, 25, 50]
-            });
-    
-            // Evento para abrir el modal y llenar los datos del producto
-            $('.add-button').on('click', function() {
-                // Obtener los datos del producto
-                const row = $(this).closest('tr');
-                const productName = row.find('th').text(); // Nombre
-                const productColor = row.find('td:nth-child(2)').text(); // Color
-                const productSize = row.find('td:nth-child(3)').text(); // Talla
-                const productCategory = row.find('td:nth-child(4)').text(); // Categoría
-                const productPrice = row.find('td:nth-child(5)').text(); // Precio
-                const productStock = row.find('td:nth-child(6)').text(); // Stock actual
-                const productModificar = row.find('td:nth-child(6)').text(); // Stock a modificar
+      $(document).ready(function () {
+        // Llenar el formulario con los datos del producto cuando se abre el modal
+        $(".add-button").on("click", function () {
+          const row = $(this).closest("tr");
+          const productId = $(this).data("id");
 
-                // Llenar el formulario con los datos
-                $('#productName').val(productName);
-                $('#productColor').val(productColor);
-                $('#productSize').val(productSize);
-                $('#productCategory').val(productCategory);
-                $('#productPrice').val(productPrice);
-                $('#productStock').val(productStock);
-                $('#productModificar').val('');
-    
-                // Opcional: Puedes almacenar el ID del producto en un campo oculto si lo necesitas
-                $('#addProductForm').data('product-id', $(this).data('id'));
-            });
-    
-            // Evento para manejar la acción de agregar stock
-            $('#addProductButton').on('click', function() {
-                const productId = $('#addProductForm').data('product-id');
-                const stockToAdd = $('#productModificar').val();
-    
-                // Aquí puedes hacer la llamada AJAX para agregar el stock
-                $.ajax({
-                    url: `/agregarProducto/${productId}/`, // Cambia esto según tu URL, debe ser la ruta de agregar stock
-                    type: 'POST',
-                    data: {
-                        'stock': stockToAdd,
-                        'csrfmiddlewaretoken': '{{ csrf_token }}' // Asegúrate de que el token CSRF esté disponible
-                    },
-                    success: function(result) {
-                        // Si la adición fue exitosa, recarga la página o actualiza la tabla
-                        location.reload(); // O actualiza la tabla de productos
-                    },
-                    error: function(xhr, status, error) {
-                        alert('Error al agregar stock: ' + error);
-                    }
-                });
-            });
+          if (!productId) {
+            alert("Error: No se encontró el ID del producto.");
+            return; // Evita continuar si no hay un ID válido
+          }
+
+          // Obtener los datos del producto
+          const productName = row.find("th").text(); // Nombre
+          const productDescripcion = row.find("td:nth-child(2)").text(); // Descripción
+          const productColor = row.find("td:nth-child(3)").text(); // Color
+          const productSize = row.find("td:nth-child(4)").text(); // Talla
+          const productCategory = row.find("td:nth-child(5)").text(); // Categoría
+          const productPrice = row.find("td:nth-child(6)").text(); // Precio
+          const productStock = row.find("td:nth-child(7)").text(); // Stock actual
+
+          // Llenar el formulario con los datos
+          $("#productId").val(productId);
+          $("#productName").val(productName);
+          $("#productDescripcion").val(productDescripcion);
+          $("#productColor").val(productColor);
+          $("#productSize").val(productSize);
+          $("#productCategory").val(productCategory);
+          $("#productPrice").val(productPrice);
+          $("#productStock").val(productStock);
+          $("#productModificar").val(""); // Reiniciar el campo de nuevo stock
         });
+
+        // Evento para manejar la acción de guardar cambios
+        $("#addProductButton").on("click", function () {
+          const productId = $("#productId").val();
+          const productName = $("#productName").val();
+          const productDescripcion = $("#productDescripcion").val();
+          const productColor = $("#productColor").val();
+          const productSize = $("#productSize").val();
+          const productCategory = $("#productCategory").val();
+          const productPrice = $("#productPrice").val();
+          const productStock = $("#productStock").val();
+          const productModificar = $("#productModificar").val();
+
+          // Realizar la llamada AJAX para enviar los datos
+          $.ajax({
+            url: "/modificarProducto/" + productId + "/",
+            type: "POST",
+            data: {
+              nombre: productName,
+              descripcion: productDescripcion,
+              color: productColor,
+              talla: productSize,
+              categoria: productCategory,
+              precio: productPrice,
+              stock: productStock,
+              nuevo_stock: productModificar,
+              csrfmiddlewaretoken: "{{ csrf_token }}", // Token CSRF
+            },
+            success: function (result) {
+              // Si la actualización fue exitosa, recargar la página o actualizar la tabla
+              location.reload(); // O actualizar solo la fila modificada
+            },
+            error: function (xhr, status, error) {
+              alert("Error al actualizar el producto: " + error);
+            },
+          });
+        });
+      });
     </script>
-    
-
-</body>
-
-
+  </body>
 </html>
