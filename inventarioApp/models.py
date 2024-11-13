@@ -28,3 +28,16 @@ class Usuarios(models.Model):
         if not self.id:
             self.password = make_password(self.password)
         super(Usuarios, self).save(*args, **kwargs)
+        
+class Movimiento(models.Model):
+    nombre = models.CharField(max_length=100)
+    color = models.CharField(max_length=50)
+    talla = models.CharField(max_length=10)
+    categoria = models.CharField(max_length=50)
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    stock = models.IntegerField()
+    accion = models.CharField(max_length=20)  # Ej. "agregar", "editar", "eliminar"
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.accion} - {self.nombre} - {self.fecha}"

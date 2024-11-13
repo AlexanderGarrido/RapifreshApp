@@ -3,7 +3,7 @@ from .forms import LoginForm, productosForm
 from .models import Usuarios  
 from django.contrib.auth.hashers import check_password 
 from django.contrib import messages
-from .models import Productos
+from .models import Productos, Movimiento
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 
@@ -59,16 +59,15 @@ def inventario(request):
     # Obtener la categoría seleccionada desde la URL (GET request)
     categoria_seleccionada = request.GET.get('categoria')
 
-    # Dependiendo de la categoría seleccionada, obtenemos los productos correspondientes
+    # Filtrar productos por categoría
     productos = []
     if categoria_seleccionada == 'Pantalones':
         productos = Productos.objects.all()
     elif categoria_seleccionada == 'Camisetas':
-        productos = Productos.objects.all()  # Asumimos que "Camisetas" corresponde a "Poleras"
+        productos = Productos.objects.all()
     elif categoria_seleccionada == 'Zapatos':
         productos = Productos.objects.all()
     else:
-        # Si no hay categoría seleccionada, obtenemos todos los productos de todas las categorías
         productos = list(Productos.objects.all())
 
     # Si se ha enviado un cambio de stock
@@ -77,17 +76,21 @@ def inventario(request):
         producto_id = int(request.POST.get('producto_id'))
         nuevo_stock = int(request.POST.get('nuevo_stock'))
 
-        # Dependiendo de la categoría del producto, actualizamos el stock
-        if categoria_seleccionada == 'Pantalones':
-            producto = Productos.objects.get(id=producto_id)
-        elif categoria_seleccionada == 'Camisetas':
-            producto = Productos.objects.get(id=producto_id)
-        elif categoria_seleccionada == 'Zapatos':
-            producto = Productos.objects.get(id=producto_id)
-        
-        # Actualizar el stock en la base de datos
+        # Obtener el producto y actualizar el stock
+        producto = Productos.objects.get(id=producto_id)
         producto.stock = nuevo_stock
         producto.save()
+
+        # Registrar el movimiento de "actualización de stock" en la tabla Movimiento
+        Movimiento.objects.create(
+            nombre=producto.nombre,
+            color=producto.color,
+            talla=producto.talla,
+            categoria=producto.categoria,
+            precio=producto.precio,
+            stock=nuevo_stock,
+            accion="actualización de stock"  # Tipo de acción
+        )
 
         # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
         return redirect('inventario')
@@ -96,7 +99,7 @@ def inventario(request):
     data = {
         'seccion': 'inventario',
         'productos': productos,
-        'categoria_seleccionada': categoria_seleccionada,  # Para marcar la categoría seleccionada en el filtro
+        'categoria_seleccionada': categoria_seleccionada,
     }
 
     return render(request, 'inventarioApp/inventario.html', data)
@@ -105,16 +108,15 @@ def inventarioEmp(request):
     # Obtener la categoría seleccionada desde la URL (GET request)
     categoria_seleccionada = request.GET.get('categoria')
 
-    # Dependiendo de la categoría seleccionada, obtenemos los productos correspondientes
+    # Filtrar productos por categoría
     productos = []
     if categoria_seleccionada == 'Pantalones':
         productos = Productos.objects.all()
     elif categoria_seleccionada == 'Camisetas':
-        productos = Productos.objects.all()  # Asumimos que "Camisetas" corresponde a "Poleras"
+        productos = Productos.objects.all()
     elif categoria_seleccionada == 'Zapatos':
         productos = Productos.objects.all()
     else:
-        # Si no hay categoría seleccionada, obtenemos todos los productos de todas las categorías
         productos = list(Productos.objects.all())
 
     # Si se ha enviado un cambio de stock
@@ -123,17 +125,21 @@ def inventarioEmp(request):
         producto_id = int(request.POST.get('producto_id'))
         nuevo_stock = int(request.POST.get('nuevo_stock'))
 
-        # Dependiendo de la categoría del producto, actualizamos el stock
-        if categoria_seleccionada == 'Pantalones':
-            producto = Productos.objects.get(id=producto_id)
-        elif categoria_seleccionada == 'Camisetas':
-            producto = Productos.objects.get(id=producto_id)
-        elif categoria_seleccionada == 'Zapatos':
-            producto = Productos.objects.get(id=producto_id)
-        
-        # Actualizar el stock en la base de datos
+        # Obtener el producto y actualizar el stock
+        producto = Productos.objects.get(id=producto_id)
         producto.stock = nuevo_stock
         producto.save()
+
+        # Registrar el movimiento de "actualización de stock" en la tabla Movimiento
+        Movimiento.objects.create(
+            nombre=producto.nombre,
+            color=producto.color,
+            talla=producto.talla,
+            categoria=producto.categoria,
+            precio=producto.precio,
+            stock=nuevo_stock,
+            accion="actualización de stock"  # Tipo de acción
+        )
 
         # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
         return redirect('inventario')
@@ -142,10 +148,10 @@ def inventarioEmp(request):
     data = {
         'seccion': 'inventario',
         'productos': productos,
-        'categoria_seleccionada': categoria_seleccionada,  # Para marcar la categoría seleccionada en el filtro
+        'categoria_seleccionada': categoria_seleccionada,
     }
 
-    return render(request, 'inventarioApp/inventarioEmp.html', data)
+    return render(request, 'inventarioApp/inventario.html', data)
 
 
 def usuario(request):
@@ -158,7 +164,33 @@ def agregarProducto(request):
     if request.method == 'POST':
         form = productosForm(request.POST)
         if form.is_valid():
-            Productos.objects.create(nombre=form.cleaned_data['nombre'], descripcion=form.cleaned_data['descripcion'], color=form.cleaned_data['color'], talla=form.cleaned_data['talla'], categoria=form.cleaned_data['categoria'], precio=form.cleaned_data['precio'], stock=form.cleaned_data['stock'])
+            # Crear el nuevo producto
+            nuevo_producto = Productos.objects.create(
+                nombre=form.cleaned_data['nombre'],
+                descripcion=form.cleaned_data['descripcion'],
+                color=form.cleaned_data['color'],
+                talla=form.cleaned_data['talla'],
+                categoria=form.cleaned_data['categoria'],
+                precio=form.cleaned_data['precio'],
+                stock=form.cleaned_data['stock']
+            )
+
+            # Registrar el movimiento de "agregar" en la tabla Movimiento
+            Movimiento.objects.create(
+                nombre=nuevo_producto.nombre,
+                color=nuevo_producto.color,
+                talla=nuevo_producto.talla,
+                categoria=nuevo_producto.categoria,
+                precio=nuevo_producto.precio,
+                stock=nuevo_producto.stock,
+                accion="agregar"  # Tipo de acción
+            )
+
             return HttpResponseRedirect(reverse('inventario'))
     data = {'form': form}
     return render(request, 'inventarioApp/agregarProducto.html', data)
+
+def reports(request):
+    # Obtener todos los movimientos ordenados por fecha descendente
+    movimientos = Movimiento.objects.all().order_by('-fecha')
+    return render(request, 'inventarioApp/reports.html', {'movimientos': movimientos})
