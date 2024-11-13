@@ -8,6 +8,8 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from datetime import datetime
 from django.db.models import Q
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 
 def login_view(request):
     if request.method == 'POST':
@@ -144,7 +146,7 @@ def inventarioEmp(request):
         )
 
         # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
-        return redirect('inventario')
+        return redirect('inventarioApp/inventarioEmp.html')
 
     # Datos que pasamos al template
     data = {
@@ -153,7 +155,7 @@ def inventarioEmp(request):
         'categoria_seleccionada': categoria_seleccionada,
     }
 
-    return render(request, 'inventarioApp/inventario.html', data)
+    return render(request, 'inventarioApp/inventarioEmp.html', data)
 
 
 def usuario(request):
@@ -188,7 +190,7 @@ def agregarProducto(request):
                 accion="Agregar"  # Tipo de acción
             )
 
-            return HttpResponseRedirect(reverse('inventario'))
+            return HttpResponseRedirect(reverse('inventarioEmp'))
     data = {'form': form}
     return render(request, 'inventarioApp/agregarProducto.html', data)
 
@@ -209,3 +211,16 @@ def reports(request):
         movimientos = movimientos.filter(accion=action_type)
 
     return render(request, 'inventarioApp/reports.html', {'movimientos': movimientos})
+
+def ajustarStock(request, producto_id):
+    if request.method == "POST":
+        adjustment = int(request.POST.get("adjustment", 0))
+        producto = get_object_or_404(Productos, id=producto_id)
+
+        # Ajustar el stock
+        producto.stock += adjustment
+        producto.save()
+        
+        return JsonResponse({"status": "success", "new_stock": producto.stock})
+    
+    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)

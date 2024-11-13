@@ -28,4 +28,5 @@ urlpatterns = [
     path('inicioEmp/', inventario_viewEmp, name='inicioEmp'),
     path('usuarios/', usuario, name='usuarios'),
     path('agregarProducto/', agregarProducto, name='agregarProducto'),
+    path('ajustarStock/<int:producto_id>/', ajustarStock, name='ajustarStock'),
 ]
