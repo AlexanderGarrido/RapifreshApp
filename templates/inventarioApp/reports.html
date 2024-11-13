@@ -6,10 +6,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Inventario</title>
-  <!-- CSS de BS5 -->
+  <!-- CSS de Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-  integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <!-- CSS DATATABLE -->
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- CSS de DataTables -->
   <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 </head>
@@ -17,34 +17,62 @@
 <body style="background-color: #ffe9cc;">
   <div class="d-flex">
     <!-- Barra lateral -->
-    <nav class="bg-dark p-3" style="width: 250px; height: 100vh;">
-        <div class="text-center mb-4">
-            <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid" style="width: 150px; border-radius: 50%;">
-        </div>
-        <h2 class="text-center text-white mb-4">AMISTORE</h2>
-        <ul class="nav flex-column">
-            <li class="nav-item mb-2">
-                <a href="{% url 'inicio' %}" class="nav-link text-white"><i class="fa-solid fa-home me-2"></i>Inicio</a>
-            </li>
-            <li class="nav-item mb-2">
-                <a href="{% url 'inventario' %}" class="nav-link text-white"><i class="fa-solid fa-box me-2"></i>Inventario de Productos</a>
-            </li>
-            <li class="nav-item mb-2">
-                <a href="{% url 'reports' %}" class="nav-link text-white"><i class="fa-solid fa-chart-line me-2"></i>Generar Reporte Diario</a>
-            </li>
-        </ul>
+    <nav class="bg-dark p-3 d-flex flex-column" style="width: 250px; height: 100vh;">
+      <div class="text-center mb-4">
+          <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid" style="width: 150px; border-radius: 50%;">
+      </div>
+      <h2 class="text-center text-white mb-4">AMISTORE</h2>
+      <ul class="nav flex-column flex-grow-1">
+          <li class="nav-item mb-2">
+              <a href="{% url 'inicio' %}" class="nav-link text-white"><i class="fa-solid fa-home me-2"></i>Inicio</a>
+          </li>
+          <li class="nav-item mb-2">
+              <a href="{% url 'reports' %}" class="nav-link text-white"><i class="fa-solid fa-chart-line me-2"></i>Reportes</a>
+          </li>
+          <li class="nav-item mb-2">
+              <a href="{% url 'usuarios' %}" class="nav-link text-white"><i class="fa-solid fa-copy me-2"></i>Administrar Usuarios</a>
+          </li>
+      </ul>
+      <ul class="nav flex-column">
+          <li class="nav-item mb-2 ">
+              <a href="{% url 'login' %}" class="nav-link text-white"><i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar Sesión</a>
+          </li>
+      </ul>
     </nav>
 
     <!-- Contenido principal -->
     <div class="container-fluid p-4">
       <div class="d-flex justify-content-between align-items-center">
         <h1 class="mb-0">Reportes Diarios</h1>
-        <a href="{% url 'login' %}" class="btn btn-primary"><i class="fa-solid fa-right-from-bracket"></i></a>
       </div>
 
       <div class="alert alert-info mt-4" role="alert">
         <i class="fa-solid fa-info-circle"></i> Bienvenido a la gestión de Reportes.
       </div>
+
+      <!-- Filtros de Reporte -->
+      <form method="get" class="mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="startDate" class="form-label">Fecha de inicio</label>
+                <input type="date" id="startDate" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+            </div>
+            <div class="col-md-4">
+                <label for="endDate" class="form-label">Fecha de fin</label>
+                <input type="date" id="endDate" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+            </div>
+            <div class="col-md-4">
+                <label for="actionType" class="form-label">Tipo de Acción</label>
+                <select id="actionType" name="action_type" class="form-select">
+                    <option value="" {% if not request.GET.action_type %}selected{% endif %}>Todos</option>
+                    <option value="agregar" {% if request.GET.action_type == "agregar" %}selected{% endif %}>Agregar</option>
+                    <option value="actualización de stock" {% if request.GET.action_type == "actualización de stock" %}selected{% endif %}>Actualización de Stock</option>
+                    <option value="eliminar" {% if request.GET.action_type == "eliminar" %}selected{% endif %}>Eliminar</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Aplicar Filtros</button>
+      </form>
 
       <!-- Tabla de Movimientos de Inventario -->
       <div class="table-responsive mt-4">
@@ -72,7 +100,7 @@
                       <td>{{ movimiento.precio }}</td>
                       <td>{{ movimiento.stock }}</td>
                       <td>{{ movimiento.accion }}</td>
-                      <td>{{ movimiento.fecha }}</td>
+                      <td>{{ movimiento.fecha|date:"d-m-Y H:i" }}</td>
                   </tr>
                   {% endfor %}
                   {% else %}
@@ -84,8 +112,9 @@
           </table>
       </div>
 
-      <!-- Botón para descargar el PDF -->
+      <!-- Botones de Exportación -->
       <button id="downloadPDF" class="btn btn-primary mt-3">Descargar Reporte PDF</button>
+      <button id="downloadCSV" class="btn btn-secondary mt-3 ms-2">Descargar Reporte CSV</button>
     </div>
   </div>
 
@@ -108,37 +137,75 @@
         doc.setFontSize(12);
         doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 10, 20);
 
-        // Seleccionar la tabla de movimientos
-        const table = document.querySelector('#movementsTable');
+        // Seleccionar la tabla de movimientos con el ID correcto
+        const table = document.querySelector('#example');
 
-        // Convertir la tabla en imagen y agregarla al PDF
-        html2canvas(table).then(canvas => {
+        html2canvas(table, {scrollY: -window.scrollY}).then(canvas => {
             const imgData = canvas.toDataURL('image/png');
             doc.addImage(imgData, 'PNG', 10, 30, 190, 0); // Ajusta la imagen al PDF
             doc.save('ReporteMovimientosInventario.pdf'); // Guarda el PDF
         });
     });
+
+    // Exportación de la tabla a CSV
+    document.getElementById('downloadCSV').addEventListener('click', () => {
+        const rows = document.querySelectorAll("#example tr");
+        let csvContent = "data:text/csv;charset=utf-8,";
+        
+        rows.forEach(row => {
+            let rowData = Array.from(row.querySelectorAll("td, th")).map(cell => cell.textContent).join(",");
+            csvContent += rowData + "\r\n";
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "ReporteMovimientosInventario.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
   </script>
-   <!-- JS de BS5 -->
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-   integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-   crossorigin="anonymous"></script>
-   <!-- JS DATATABLE -->
-   <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-   <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
-   <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
-   <script>
-       $(document).ready(function () {
-           $('#example').DataTable({
-               language: {
-                   url: 'https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json'
-               },
-               pageLength: 10,
-               lengthMenu: [5, 10, 25, 50]
-           });
-       });
-   </script>
+
+  <!-- JS de Bootstrap y DataTables -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+  <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
+
+  <!-- Inicialización de DataTable y Filtro de Acción -->
+  <script>
+      $(document).ready(function () {
+          const table = $('#example').DataTable({
+              language: { url: 'https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json' },
+              pageLength: 10,
+              lengthMenu: [5, 10, 25, 50]
+          });
+
+          // Filtrar por acción y fechas en DataTable
+          $('#startDate, #endDate, #actionType').on('change', function () {
+              const startDate = $('#startDate').val();
+              const endDate = $('#endDate').val();
+              const actionType = $('#actionType').val();
+
+              // Filtrar por acción
+              table.column(6).search(actionType ? '^' + actionType + '$' : '', true, false).draw();
+
+              // Filtrar por fechas
+              table.rows().every(function () {
+                  const dateText = this.data()[7]; // Fecha en formato dd-mm-aaaa
+                  const [day, month, year] = dateText.split('-');
+                  const rowDate = new Date(`${year}-${month}-${day}`);
+
+                  const isAfterStart = startDate ? new Date(startDate) <= rowDate : true;
+                  const isBeforeEnd = endDate ? rowDate <= new Date(endDate) : true;
+
+                  this.visible(isAfterStart && isBeforeEnd);
+              });
+          });
+      });
+  </script>
 </body>
 
 </html>

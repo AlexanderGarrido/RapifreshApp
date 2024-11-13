@@ -6,6 +6,8 @@ from django.contrib import messages
 from .models import Productos, Movimiento
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+from datetime import datetime
+from django.db.models import Q
 
 def login_view(request):
     if request.method == 'POST':
@@ -89,7 +91,7 @@ def inventario(request):
             categoria=producto.categoria,
             precio=producto.precio,
             stock=nuevo_stock,
-            accion="actualización de stock"  # Tipo de acción
+            accion="Actualización de stock"  # Tipo de acción
         )
 
         # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
@@ -138,7 +140,7 @@ def inventarioEmp(request):
             categoria=producto.categoria,
             precio=producto.precio,
             stock=nuevo_stock,
-            accion="actualización de stock"  # Tipo de acción
+            accion="Actualización de stock"  # Tipo de acción
         )
 
         # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
@@ -183,7 +185,7 @@ def agregarProducto(request):
                 categoria=nuevo_producto.categoria,
                 precio=nuevo_producto.precio,
                 stock=nuevo_producto.stock,
-                accion="agregar"  # Tipo de acción
+                accion="Agregar"  # Tipo de acción
             )
 
             return HttpResponseRedirect(reverse('inventario'))
@@ -191,6 +193,19 @@ def agregarProducto(request):
     return render(request, 'inventarioApp/agregarProducto.html', data)
 
 def reports(request):
-    # Obtener todos los movimientos ordenados por fecha descendente
-    movimientos = Movimiento.objects.all().order_by('-fecha')
+    movimientos = Movimiento.objects.all()
+    
+    # Obtener filtros desde los parámetros GET
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    action_type = request.GET.get('action_type')
+
+    # Filtrar movimientos en base a los filtros proporcionados
+    if start_date:
+        movimientos = movimientos.filter(fecha__gte=datetime.strptime(start_date, '%Y-%m-%d'))
+    if end_date:
+        movimientos = movimientos.filter(fecha__lte=datetime.strptime(end_date, '%Y-%m-%d'))
+    if action_type:
+        movimientos = movimientos.filter(accion=action_type)
+
     return render(request, 'inventarioApp/reports.html', {'movimientos': movimientos})
