@@ -11,6 +11,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
+#login de inicio de sesion
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -59,33 +60,24 @@ def inventario_viewEmp(request):
 def reports(request):
     return render(request, 'inventarioApp/reports.html')
 
+# Inventario vista de administradores
 def inventario(request):
-    # Obtener la categoría seleccionada desde la URL (GET request)
+    # Obtener la categoría seleccionada desde la URL
     categoria_seleccionada = request.GET.get('categoria')
 
-    # Filtrar productos por categoría
-    productos = []
-    if categoria_seleccionada == 'Pantalones':
-        productos = Productos.objects.all()
-    elif categoria_seleccionada == 'Camisetas':
-        productos = Productos.objects.all()
-    elif categoria_seleccionada == 'Zapatos':
-        productos = Productos.objects.all()
-    else:
-        productos = list(Productos.objects.all())
+    # Filtrar productos (puedes agregar lógica real si es necesario)
+    productos = Productos.objects.all()
 
-    # Si se ha enviado un cambio de stock
+    # Actualización de stock
     if request.method == 'POST':
-        # Obtener el ID del producto y el nuevo stock desde el formulario
         producto_id = int(request.POST.get('producto_id'))
         nuevo_stock = int(request.POST.get('nuevo_stock'))
 
-        # Obtener el producto y actualizar el stock
         producto = Productos.objects.get(id=producto_id)
         producto.stock = nuevo_stock
         producto.save()
 
-        # Registrar el movimiento de "actualización de stock" en la tabla Movimiento
+        # Registrar el movimiento
         Movimiento.objects.create(
             nombre=producto.nombre,
             color=producto.color,
@@ -93,10 +85,9 @@ def inventario(request):
             categoria=producto.categoria,
             precio=producto.precio,
             stock=nuevo_stock,
-            accion="Actualización de stock"  # Tipo de acción
+            accion="Actualización de stock"
         )
 
-        # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
         return redirect('inventario')
 
     # Datos que pasamos al template
@@ -108,6 +99,7 @@ def inventario(request):
 
     return render(request, 'inventarioApp/inventario.html', data)
 
+# Inventario vista de empleados
 def inventarioEmp(request):
     # Obtener la categoría seleccionada desde la URL (GET request)
     categoria_seleccionada = request.GET.get('categoria')
@@ -162,7 +154,7 @@ def usuario(request):
     usuarios = Usuarios.objects.all()
     return render(request, 'inventarioApp/usuarios.html', {'Usuarios': usuarios})
 
-
+#agregar producto
 def agregarProducto(request):
     form = productosForm()
     if request.method == 'POST':
@@ -194,6 +186,7 @@ def agregarProducto(request):
     data = {'form': form}
     return render(request, 'inventarioApp/agregarProducto.html', data)
 
+# Reportes de inventario
 def reports(request):
     movimientos = Movimiento.objects.all()
     
@@ -212,6 +205,7 @@ def reports(request):
 
     return render(request, 'inventarioApp/reports.html', {'movimientos': movimientos})
 
+# Ajustar el stock de un producto
 def ajustarStock(request, producto_id):
     if request.method == "POST":
         adjustment = int(request.POST.get("adjustment", 0))
@@ -225,8 +219,7 @@ def ajustarStock(request, producto_id):
     
     return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
 
-  # Asegúrate de que el modelo de Producto está importado
-
+# Modificar un producto
 def modificarProducto(request, producto_id):
     if request.method == 'POST':
         try:
@@ -265,3 +258,21 @@ def modificarProducto(request, producto_id):
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
     else:
         return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
+
+
+def eliminarProducto(request, producto_id):
+    producto = Productos.objects.get(id=producto_id)
+    producto.delete()
+
+    # Registrar el movimiento de "eliminación" en la tabla Movimiento
+    Movimiento.objects.create(
+        nombre=producto.nombre,
+        color=producto.color,
+        talla=producto.talla,
+        categoria=producto.categoria,
+        precio=producto.precio,
+        stock=producto.stock,
+        accion="Eliminación"  # Tipo de acción
+    )
+    return HttpResponseRedirect(reverse('inventario'))
+    

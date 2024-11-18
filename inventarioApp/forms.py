@@ -31,3 +31,11 @@ class productosForm(forms.Form):
     categoria = forms.CharField(max_length=100)
     precio = forms.IntegerField()    
     stock = forms.IntegerField()
+
+    nombre.widget.attrs.update({'class': 'form-control', 'placeholder': 'Nombre del producto'})
+    descripcion.widget.attrs.update({'class': 'form-control', 'placeholder': 'Descripción del producto'})
+    color.widget.attrs.update({'class': 'form-control', 'placeholder': 'Color del producto'})
+    talla.widget.attrs.update({'class': 'form-control', 'placeholder': 'Talla del producto'})
+    categoria.widget.attrs.update({'class': 'form-control', 'placeholder': 'Categoría del producto'})
+    precio.widget.attrs.update({'class': 'form-control', 'placeholder': 'Precio del producto'})
+    stock.widget.attrs.update({'class': 'form-control', 'placeholder': 'Stock del producto'})
