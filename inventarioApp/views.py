@@ -214,6 +214,17 @@ def ajustarStock(request, producto_id):
         # Ajustar el stock
         producto.stock += adjustment
         producto.save()
+
+        # Registrar el movimiento de "ajuste" en la tabla Movimiento
+        Movimiento.objects.create(
+            nombre=producto.nombre,
+            color=producto.color,
+            talla=producto.talla,
+            categoria=producto.categoria,
+            precio=producto.precio,
+            stock=producto.stock,
+            accion="Modificación"  # Tipo de acción
+        )
         
         return JsonResponse({"status": "success", "new_stock": producto.stock})
     
@@ -251,6 +262,17 @@ def modificarProducto(request, producto_id):
 
             # Guardar cambios en la base de datos
             producto.save()
+
+            # Registrar el movimiento de "modificación" en la tabla Movimiento
+            Movimiento.objects.create(
+                nombre=producto.nombre,
+                color=producto.color,
+                talla=producto.talla,
+                categoria=producto.categoria,
+                precio=producto.precio,
+                stock=producto.stock,
+                accion="Modificación"  # Tipo de acción
+            )
 
             return JsonResponse({'success': True})
         except Exception as e:

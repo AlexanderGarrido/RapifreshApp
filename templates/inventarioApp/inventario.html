@@ -137,7 +137,7 @@
             {% if productos %} {% for producto in productos %}
             <tr class="table-light">
               <th scope="row">{{ producto.id }}</th>
-              <th scope="row">{{ producto.nombre }}</th>
+              <td>{{ producto.nombre }}</td>
               <td>{{ producto.descripcion }}</td>
               <td>{{ producto.color }}</td>
               <td>{{ producto.talla }}</td>
@@ -192,146 +192,124 @@
       </div>
     </div>
 
-    <!-- Modal de Agregar Producto -->
     <div
-      class="modal fade"
-      id="addProductModal"
-      tabindex="-1"
-      aria-labelledby="addProductModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addProductModalLabel">
-              Modificar stock
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <form
-              method="post"
-              class="col-12 border border-info rounded p-4"
-              id="addProductForm"
-            >
-              {% csrf_token %}
-              <input type="hidden" id="productId" name="producto_id" />
-              <div class="mb-3 row">
-                <div class="mb-3 row">
-                  <label for="productName" class="col-sm-4 col-form-label">Nombre</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="productName" name="nombre" />
-                  </div>
-                </div>
-      
-                <!-- Campo de Descripción -->
-                <div class="mb-3 row">
-                  <label for="productDescripcion" class="col-sm-4 col-form-label">Descripción</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="productDescripcion" name="descripcion" />
-                  </div>
-                </div>
-      
-                <!-- Resto de los campos -->
-                <div class="mb-3 row">
-                  <label for="productColor" class="col-sm-4 col-form-label">Color</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="productColor" name="color" />
-                  </div>
-                </div>
-              <div class="mb-3 row">
-                <label for="productSize" class="col-sm-4 col-form-label"
-                  >Talla</label
-                >
-                <div class="col-sm-8">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="productSize"
-                    name="talla"
-                  />
-                </div>
+    class="modal fade"
+    id="addProductModal"
+    tabindex="-1"
+    aria-labelledby="addProductModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addProductModalLabel">
+            Modificar stock
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form
+            method="post"
+            class="col-12 border border-info rounded p-4"
+            id="addProductForm"
+          >
+            {% csrf_token %}
+            
+            <!-- Campo de ID del Producto -->
+            <div class="mb-3 row">
+              <label for="productId" class="col-sm-4 col-form-label">ID</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="productId" name="id" readonly />
               </div>
-              <div class="mb-3 row">
-                <label for="productCategory" class="col-sm-4 col-form-label"
-                  >Categoría</label
-                >
-                <div class="col-sm-8">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="productCategory"
-                    name="categoria"
-                  />
-                </div>
+            </div>
+  
+            <!-- Campo de Nombre -->
+            <div class="mb-3 row">
+              <label for="productName" class="col-sm-4 col-form-label">Nombre</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="productName" name="nombre" />
               </div>
-              <div class="mb-3 row">
-                <label for="productPrice" class="col-sm-4 col-form-label"
-                  >Precio</label
-                >
-                <div class="col-sm-8">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="productPrice"
-                    name="precio"
-                  />
-                </div>
+            </div>
+  
+            <!-- Campo de Descripción -->
+            <div class="mb-3 row">
+              <label for="productDescripcion" class="col-sm-4 col-form-label">Descripción</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="productDescripcion" name="descripcion" />
               </div>
-              <div class="mb-3 row">
-                <label for="productStock" class="col-sm-4 col-form-label"
-                  >Stock actual</label
-                >
-                <div class="col-sm-8">
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="productStock"
-                    name="stock"
-                    disabled
-                    readonly
-                  />
-                </div>
+            </div>
+  
+            <!-- Campo de Color -->
+            <div class="mb-3 row">
+              <label for="productColor" class="col-sm-4 col-form-label">Color</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="productColor" name="color" />
               </div>
-              <div class="mb-3 row">
-                <label
-                  for="productModificar"
-                  class="col-sm-4 col-form-label"
-                  style="font-weight: bold"
-                  >Nuevo stock</label
-                >
-                <div class="col-sm-8">
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="productModificar"
-                    name="stock"
-                  />
-                </div>
+            </div>
+  
+            <!-- Campo de Talla -->
+            <div class="mb-3 row">
+              <label for="productSize" class="col-sm-4 col-form-label">Talla</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="productSize" name="talla" />
               </div>
-            </form>
-            <input type="hidden" id="csrfToken" value="{{ csrf_token }}" />
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Cancelar
-            </button>
-            <button type="button" class="btn btn-primary" id="addProductButton">
-              Guardar
-            </button>
-          </div>
+            </div>
+  
+            <!-- Campo de Categoría -->
+            <div class="mb-3 row">
+              <label for="productCategory" class="col-sm-4 col-form-label">Categoría</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="productCategory" name="categoria" />
+              </div>
+            </div>
+  
+            <!-- Campo de Precio -->
+            <div class="mb-3 row">
+              <label for="productPrice" class="col-sm-4 col-form-label">Precio</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="productPrice" name="precio" />
+              </div>
+            </div>
+  
+            <!-- Campo de Stock Actual (solo lectura) -->
+            <div class="mb-3 row">
+              <label for="productStock" class="col-sm-4 col-form-label">Stock actual</label>
+              <div class="col-sm-8">
+                <input type="number" class="form-control" id="productStock" name="stock" disabled readonly />
+              </div>
+            </div>
+  
+            <!-- Campo para Nuevo Stock -->
+            <div class="mb-3 row">
+              <label for="productModificar" class="col-sm-4 col-form-label" style="font-weight: bold">Nuevo stock</label>
+              <div class="col-sm-8">
+                <input type="number" class="form-control" id="productModificar" name="nuevo_stock" />
+              </div>
+            </div>
+  
+          </form>
+          <input type="hidden" id="csrfToken" value="{{ csrf_token }}" />
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-primary" id="addProductButton">
+            Guardar
+          </button>
         </div>
       </div>
     </div>
+  </div>
 
     <!-- Modal de eliminación de producto -->
 <!-- Modal de Confirmación para Eliminar Producto -->
@@ -368,21 +346,21 @@
         $(".add-button").on("click", function () {
           const row = $(this).closest("tr");
           const productId = $(this).data("id");
-
+    
           if (!productId) {
             alert("Error: No se encontró el ID del producto.");
             return; // Evita continuar si no hay un ID válido
           }
-
-          // Obtener los datos del producto
-          const productName = row.find("th").text(); // Nombre
-          const productDescripcion = row.find("td:nth-child(2)").text(); // Descripción
-          const productColor = row.find("td:nth-child(3)").text(); // Color
-          const productSize = row.find("td:nth-child(4)").text(); // Talla
-          const productCategory = row.find("td:nth-child(5)").text(); // Categoría
-          const productPrice = row.find("td:nth-child(6)").text(); // Precio
-          const productStock = row.find("td:nth-child(7)").text(); // Stock actual
-
+    
+          // Obtener los datos del producto (asegurándote de obtener el texto correctamente)
+          const productName = row.find("td:nth-child(2)").text(); // Nombre
+          const productDescripcion = row.find("td:nth-child(3)").text(); // Descripción
+          const productColor = row.find("td:nth-child(4)").text(); // Color
+          const productSize = row.find("td:nth-child(5)").text(); // Talla
+          const productCategory = row.find("td:nth-child(6)").text(); // Categoría
+          const productPrice = row.find("td:nth-child(7)").text(); // Precio
+          const productStock = row.find("td:nth-child(8)").text(); // Stock actual
+    
           // Llenar el formulario con los datos
           $("#productId").val(productId);
           $("#productName").val(productName);
@@ -394,7 +372,7 @@
           $("#productStock").val(productStock);
           $("#productModificar").val(""); // Reiniciar el campo de nuevo stock
         });
-
+    
         // Evento para manejar la acción de guardar cambios
         $("#addProductButton").on("click", function () {
           const productId = $("#productId").val();
@@ -406,7 +384,7 @@
           const productPrice = $("#productPrice").val();
           const productStock = $("#productStock").val();
           const productModificar = $("#productModificar").val();
-
+    
           // Realizar la llamada AJAX para enviar los datos
           $.ajax({
             url: "/modificarProducto/" + productId + "/",
