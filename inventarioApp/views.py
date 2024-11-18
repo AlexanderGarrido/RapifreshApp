@@ -85,7 +85,7 @@ def inventario(request):
             categoria=producto.categoria,
             precio=producto.precio,
             stock=nuevo_stock,
-            accion="Actualización de stock"
+            accion="Ajuste de Stock"
         )
 
         return redirect('inventario')
@@ -134,7 +134,7 @@ def inventarioEmp(request):
             categoria=producto.categoria,
             precio=producto.precio,
             stock=nuevo_stock,
-            accion="Actualización de stock"  # Tipo de acción
+            accion="Ajuste Stock"  # Tipo de acción	
         )
 
         # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
@@ -223,7 +223,7 @@ def ajustarStock(request, producto_id):
             categoria=producto.categoria,
             precio=producto.precio,
             stock=producto.stock,
-            accion="Modificación"  # Tipo de acción
+            accion="Ajuste Stock"  # Tipo de acción
         )
         
         return JsonResponse({"status": "success", "new_stock": producto.stock})

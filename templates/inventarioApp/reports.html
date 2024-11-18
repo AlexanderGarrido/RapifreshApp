@@ -17,7 +17,7 @@
 <body style="background-color: #ffe9cc;">
   <div class="d-flex">
     <!-- Barra lateral -->
-    <nav class="bg-dark p-3 d-flex flex-column" style="width: 250px; height: 100vh;">
+    <nav class="bg-dark p-3 d-flex flex-column" style="width: 250px; height: 125vh;">
       <div class="text-center mb-4">
           <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid" style="width: 150px; border-radius: 50%;">
       </div>
@@ -65,9 +65,9 @@
                 <label for="actionType" class="form-label">Tipo de Acción</label>
                 <select id="actionType" name="action_type" class="form-select">
                     <option value="" {% if not request.GET.action_type %}selected{% endif %}>Todos</option>
-                    <option value="agregar" {% if request.GET.action_type == "agregar" %}selected{% endif %}>Agregar</option>
-                    <option value="actualización de stock" {% if request.GET.action_type == "actualización de stock" %}selected{% endif %}>Actualización de Stock</option>
-                    <option value="eliminar" {% if request.GET.action_type == "eliminar" %}selected{% endif %}>Eliminar</option>
+                    <option value="Agregar" {% if request.GET.action_type == "Agregar" %}selected{% endif %}>Agregar</option>
+                    <option value="Ajuste Stock" {% if request.GET.action_type == "Ajuste Stock" %}selected{% endif %}>Ajuste de Stock</option>
+                    <option value="Eliminación" {% if request.GET.action_type == "Eliminación" %}selected{% endif %}>Eliminación</option>
                 </select>
             </div>
         </div>
