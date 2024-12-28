@@ -10,83 +10,151 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
     body {
-      background-color: #ffe9cc;
+      background-color: #ffe9cc; /* Beige claro */
+      color: #495057; /* Texto gris oscuro */
     }
-    .sidebar {
-      width: 250px;
-      height: 100vh;
+
+    /* Barra superior */
+    .navbar {
+      background-color: #343A40; /* Gris oscuro */
+      color: #FFFFFF; /* Texto blanco */
     }
-    .sidebar img {
-      width: 150px;
-      border-radius: 50%;
+
+    .navbar .nav-link {
+      color: #FFFFFF;
+      transition: background-color 0.3s, color 0.3s;
     }
+
+    .navbar .nav-link:hover {
+      background-color: #495057; /* Gris más claro */
+      color: #ffe9cc; /* Amarillo dorado */
+    }
+
+    /* Tarjetas */
     .card {
-      transition: transform 0.2s;
+      background-color: #bea17b; /* Azul vibrante */
+      color: #FFFFFF; /* Texto blanco */
+      border: none;
+      transition: transform 0.2s, box-shadow 0.3s;
     }
+
     .card:hover {
       transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
+
+    /* Botones */
+    .btn-primary {
+      background-color: #cfa266;
+      border-color: #b88d4d;
+    }
+
+    .btn-primary:hover {
+      background-color: #da9b3c; /* Azul más oscuro */
+      border-color: #cfb22e;
+    }
+
+    /* Footer */
     footer {
-      position: relative;
-      bottom: 0;
-      width: 100%;
+      background-color: #343A40; /* Gris oscuro */
+      color: #FFFFFF;
+      border-top: 2px solid #FFC107; /* Línea amarilla */
+    }
+
+    .carousel img {
+      height: 400px;
+      object-fit: cover;
     }
   </style>
 </head>
 
 <body>
-  <div class="d-flex">
-    <nav class="bg-dark p-3 d-flex flex-column" style="width: 250px; height: 100vh;">
-      <div class="text-center mb-4">
-          <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid"
-              style="width: 150px; border-radius: 50%;">
+  <!-- Barra superior -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" style="width: 80px; border-radius: 50%;"> AMISTORE
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a href="{% url 'login' %}" class="nav-link"><i class="fa-solid fa-right-from-bracket me-2"></i></a>
+          </li>
+        </ul>
       </div>
-      <h2 class="text-center text-white mb-4">AMISTORE</h2>
-      <ul class="nav flex-column flex-grow-1">
-          <li class="nav-item mb-2">
-              <a href="{% url 'inicio' %}" class="nav-link text-white"><i
-                      class="fa-solid fa-home me-2"></i>Inicio</a>
-          </li>
-          <li class="nav-item mb-2">
-              <a href="{% url 'reports' %}" class="nav-link text-white"><i
-                      class="fa-solid fa-chart-line me-2"></i>Reportes</a>
-          </li>
-          <li class="nav-item mb-2">
-              <a href="{% url 'usuarios' %}" class="nav-link text-white"><i class="fa-solid fa-copy me-2"></i>Administrar Usuarios</a>
-          </li>
-      </ul>
-
-      <ul class="nav flex-column">
-          <li class="nav-item mb-2 ">
-              <a href="{% url 'login' %}" class="nav-link text-white"><i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar Sesión</a>
-          </li>
-      </ul>
+    </div>
   </nav>
 
-    <div class="container-fluid p-4">
-      <div class="d-flex justify-content-between align-items-center">
-        <h1 class="mb-0">Inicio</h1>
+  <!-- Contenido principal -->
+  <div class="container-fluid p-4">
+    <!-- Carrusel -->
+    <div id="carouselExampleFade" class="carousel slide carousel-fade mt-4" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <video autoplay loop muted class="w-100">
+            <source src="{% static 'img/video.mp4' %}" type="video/mp4">
+            Tu navegador no soporta el elemento de video.
+          </video>
+        </div>
+        <div class="carousel-item">
+          <video autoplay loop muted class="w-100">
+            <source src="{% static 'img/publi.mp4' %}" type="video/mp4">
+            Tu navegador no soporta el elemento de video.
+          </video>
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+    
+    <hr>
+    <br><br><br><br>
+    <!-- Tarjetas -->
+    <div class="row row-cols-1 justify-content-center row-cols-md-2 row-cols-lg-3 g-4 mt-4">
+      <div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center">
+        <div class="card h-100">
+          <img src="{% static 'img/report.png' %}" class="card-img-top" alt="reporte">
+          <div class="card-body">
+            <h5 class="card-title">Reportes</h5>
+            <p class="card-text">Ingresa a gestión de reportes, para consultar todo tipo de movimientos.</p>
+            <a href="{% url 'reports' %}" class="btn btn-primary">Reportes</a>
+          </div>
+        </div>
       </div>
 
-      <div class="alert alert-info mt-4" role="alert">
-        <i class="fa-solid fa-info-circle"></i> Bienvenido a la aplicación de inventario.
+      <div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center">
+        <div class="card h-100">
+          <img src="{% static 'img/user.png' %}" class="card-img-top" alt="user">
+          <div class="card-body">
+            <h5 class="card-title">Ami Store</h5>
+            <p class="card-text">En amistore somos una familia, vaya a gestión de usuarios para tener la información detallada.</p>
+            <a href="{% url 'usuarios' %}" class="btn btn-primary">Administrar Usuarios</a>
+          </div>
+        </div>
       </div>
 
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <div class="card text-white bg-primary">
-            <div class="card-body text-center">
-              <p>Gestion de Inventario</p>
-              <a href="{% url 'inventario' %}" class="stretched-link text-white">
-                <i class="fa-solid fa-folder fa-2x"></i>
-              </a>
-            </div>
+      <div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center">
+        <div class="card h-100">
+          <img src="{% static 'img/zapas.webp' %}" class="card-img-top" alt="zapatos">
+          <div class="card-body">
+            <h5 class="card-title">Adidas Campus</h5>
+            <p class="card-text">Estos productos son referenciales, vaya a gestión de inventario para tener la información detallada.</p>
+            <a href="{% url 'inventario' %}" class="btn btn-primary">Gestión de Inventario</a>
           </div>
         </div>
       </div>
     </div>
   </div>
-
+  <br><br><br><br><br><br><br><br><br><br>
   <footer class="text-center py-3 bg-light text-secondary">
     <small>Copyright © 2024 Inventario de Productos</small>
   </footer>
@@ -95,3 +163,4 @@
 </body>
 
 </html>
+

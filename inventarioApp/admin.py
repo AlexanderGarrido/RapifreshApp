@@ -6,7 +6,7 @@ from inventarioApp.models import *
 
 
 class ProductosAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'descripcion', 'color', 'talla', 'categoria', 'precio', 'stock')
+    list_display = ('nombre', 'descripcion', 'color', 'precio', 'stock')
 
 class UsuariosAdmin(admin.ModelAdmin):
     list_display = ('email', 'nombre', 'apellido', 'rol')
