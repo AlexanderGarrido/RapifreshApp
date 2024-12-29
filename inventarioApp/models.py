@@ -9,6 +9,21 @@ class Productos(models.Model):
     color = models.CharField(max_length=100)
     precio = models.IntegerField()    
     stock = models.IntegerField()
+    talla = models.CharField(max_length=50, default='S')
+    categoria_choices = (
+        ('Pantalones', 'Pantalones'),
+        ('Poleras', 'Poleras'),
+        ('Zapatos', 'Zapatos'),
+    )
+    categoria = models.CharField(max_length=100, choices=categoria_choices, default='Poleras')
+    talla_choices = (
+        ('S', 'S'),
+        ('M', 'M'),
+        ('L', 'L'),
+        ('XL', 'XL'),
+        ('XXL', 'XXL'),
+    )
+    talla = models.CharField(max_length=50, choices=talla_choices, default='S')
 
 class Usuarios(models.Model):
     email = models.EmailField(max_length=100, unique=True)
