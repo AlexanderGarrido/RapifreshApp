@@ -14,7 +14,6 @@ categoria_choices = [
     ('Poleras', 'Poleras'),
     ('pantalones', 'Pantalones'),
     ('zapatos', 'Zapatos'),
-    ('accesorios', 'Accesorios'),
 ]
 
 
