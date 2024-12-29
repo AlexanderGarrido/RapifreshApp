@@ -1,4 +1,21 @@
 from django import forms
+from .models import Productos
+
+# Definimos las opciones
+talla_choices = [
+    ('XS', 'Extra Small'),
+    ('S', 'Small'),
+    ('M', 'Medium'),
+    ('L', 'Large'),
+    ('XL', 'Extra Large'),
+]
+
+categoria_choices = [
+    ('Poleras', 'Poleras'),
+    ('pantalones', 'Pantalones'),
+    ('zapatos', 'Zapatos'),
+    ('accesorios', 'Accesorios'),
+]
 
 
 class LoginForm(forms.Form):
@@ -27,8 +44,8 @@ class productosForm(forms.Form):
     nombre = forms.CharField(max_length=100)
     descripcion = forms.CharField(max_length=200)
     color = forms.CharField(max_length=100)
-    talla = forms.CharField(max_length=50)
-    categoria = forms.CharField(max_length=100)
+    talla = forms.ChoiceField(choices=talla_choices)  
+    categoria = forms.ChoiceField(choices=categoria_choices)
     precio = forms.IntegerField()    
     stock = forms.IntegerField()
 
