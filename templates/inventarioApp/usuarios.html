@@ -19,6 +19,7 @@
       rel="stylesheet"
       href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
       /* Estilos para la navegación y el contenedor */
       body {
@@ -68,17 +69,17 @@
       <ul class="nav flex-column">
         <li class="nav-item mb-2">
           <a href="{% url 'inicio' %}" class="nav-link text-white"
-            ><i class="bi bi-house-door-fill"></i> Inicio</a
+            ><i class="fa-solid fa-home me-2"></i> Inicio</a
           >
         </li>
         <li class="nav-item mb-2">
           <a href="{% url 'inventario' %}" class="nav-link text-white"
-            ><i class="bi bi-box-seam-fill"></i> Inventario de Productos</a
+            ><i class="fa-solid fa-box me-2"></i> Gestion de Inventario</a
           >
         </li>
         <li class="nav-item mb-2">
           <a href="{% url 'reports' %}" class="nav-link text-white"
-            ><i class="bi bi-flag-fill"></i> Generar Reporte Diario</a
+            ><i class="fa-solid fa-chart-line me-2"></i> Reportes</a
           >
         </li>
       </ul>
@@ -98,7 +99,7 @@
       <div class="table-responsive">
         <table
           id="example"
-          class="table table-striped"
+          class="table table-striped table-bordered"
           style="width: 100%"
         >
           <thead>

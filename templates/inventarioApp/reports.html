@@ -27,10 +27,10 @@
               <a href="{% url 'inicio' %}" class="nav-link text-white"><i class="fa-solid fa-home me-2"></i>Inicio</a>
           </li>
           <li class="nav-item mb-2">
-              <a href="{% url 'reports' %}" class="nav-link text-white"><i class="fa-solid fa-chart-line me-2"></i>Reportes</a>
+              <a href="{% url 'usuarios' %}" class="nav-link text-white"><i class="fa-solid fa-copy me-2"></i>Administrar Usuarios</a>
           </li>
           <li class="nav-item mb-2">
-              <a href="{% url 'usuarios' %}" class="nav-link text-white"><i class="fa-solid fa-copy me-2"></i>Administrar Usuarios</a>
+              <a href="{% url 'inventario' %}" class="nav-link text-white"><i class="fa-solid fa-box me-2"></i>Gestion de Inventario</a>
           </li>
       </ul>
       <ul class="nav flex-column">
@@ -80,7 +80,6 @@
               <thead>
                   <tr class="table-primary">
                       <th>Nombre</th>
-                      <th>Color</th>
                       <th>Talla</th>
                       <th>Categoria</th>
                       <th>Precio</th>
@@ -94,7 +93,6 @@
                   {% for movimiento in movimientos %}
                   <tr>
                       <td>{{ movimiento.nombre }}</td>
-                      <td>{{ movimiento.color }}</td>
                       <td>{{ movimiento.talla }}</td>
                       <td>{{ movimiento.categoria }}</td>
                       <td>${{ movimiento.precio }}</td>

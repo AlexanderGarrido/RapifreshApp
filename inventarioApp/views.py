@@ -80,7 +80,6 @@ def inventario(request):
         # Registrar el movimiento
         Movimiento.objects.create(
             nombre=producto.nombre,
-            color=producto.color,
             talla=producto.talla,
             categoria=producto.categoria,
             precio=producto.precio,
@@ -129,7 +128,6 @@ def inventarioEmp(request):
         # Registrar el movimiento de "actualización de stock" en la tabla Movimiento
         Movimiento.objects.create(
             nombre=producto.nombre,
-            color=producto.color,
             talla=producto.talla,
             categoria=producto.categoria,
             precio=producto.precio,
@@ -164,7 +162,6 @@ def agregarProducto(request):
             nuevo_producto = Productos.objects.create(
                 nombre=form.cleaned_data['nombre'],
                 descripcion=form.cleaned_data['descripcion'],
-                color=form.cleaned_data['color'],
                 talla=form.cleaned_data['talla'],
                 categoria=form.cleaned_data['categoria'],
                 precio=form.cleaned_data['precio'],
@@ -174,7 +171,6 @@ def agregarProducto(request):
             # Registrar el movimiento de "agregar" en la tabla Movimiento
             Movimiento.objects.create(
                 nombre=nuevo_producto.nombre,
-                color=nuevo_producto.color,
                 talla=nuevo_producto.talla,
                 categoria=nuevo_producto.categoria,
                 precio=nuevo_producto.precio,
@@ -218,7 +214,6 @@ def ajustarStock(request, producto_id):
         # Registrar el movimiento de "ajuste" en la tabla Movimiento
         Movimiento.objects.create(
             nombre=producto.nombre,
-            color=producto.color,
             talla=producto.talla,
             categoria=producto.categoria,
             precio=producto.precio,
@@ -240,19 +235,17 @@ def modificarProducto(request, producto_id):
             # Capturar los datos enviados en la solicitud
             nombre = request.POST.get('nombre')
             descripcion = request.POST.get('descripcion')
-            color = request.POST.get('color')
             talla = request.POST.get('talla')
             categoria = request.POST.get('categoria')
             precio = request.POST.get('precio')
             nuevo_stock = request.POST.get('nuevo_stock')
             
             # Mensajes de depuración
-            print(f"Datos recibidos: Nombre: {nombre}, Descripción: {descripcion}, Color: {color}, Talla: {talla}, Categoria: {categoria}, Precio: {precio}, Stock: {nuevo_stock}")
+            print(f"Datos recibidos: Nombre: {nombre}, Descripción: {descripcion}, Talla: {talla}, Categoria: {categoria}, Precio: {precio}, Stock: {nuevo_stock}")
 
             # Validar que los datos no están vacíos
             producto.nombre = nombre or producto.nombre
             producto.descripcion = descripcion or producto.descripcion
-            producto.color = color or producto.color
             producto.talla = talla or producto.talla
             producto.categoria = categoria or producto.categoria
             producto.precio = float(precio) if precio else producto.precio
@@ -266,7 +259,6 @@ def modificarProducto(request, producto_id):
             # Registrar el movimiento de "modificación" en la tabla Movimiento
             Movimiento.objects.create(
                 nombre=producto.nombre,
-                color=producto.color,
                 talla=producto.talla,
                 categoria=producto.categoria,
                 precio=producto.precio,
@@ -289,7 +281,6 @@ def eliminarProducto(request, producto_id):
     # Registrar el movimiento de "eliminación" en la tabla Movimiento
     Movimiento.objects.create(
         nombre=producto.nombre,
-        color=producto.color,
         talla=producto.talla,
         categoria=producto.categoria,
         precio=producto.precio,

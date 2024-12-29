@@ -43,7 +43,6 @@ class LoginForm(forms.Form):
 class productosForm(forms.Form):
     nombre = forms.CharField(max_length=100)
     descripcion = forms.CharField(max_length=200)
-    color = forms.CharField(max_length=100)
     talla = forms.ChoiceField(choices=talla_choices)  
     categoria = forms.ChoiceField(choices=categoria_choices)
     precio = forms.IntegerField()    
@@ -51,7 +50,6 @@ class productosForm(forms.Form):
 
     nombre.widget.attrs.update({'class': 'form-control', 'placeholder': 'Nombre del producto'})
     descripcion.widget.attrs.update({'class': 'form-control', 'placeholder': 'Descripción del producto'})
-    color.widget.attrs.update({'class': 'form-control', 'placeholder': 'Color del producto'})
     talla.widget.attrs.update({'class': 'form-control', 'placeholder': 'Talla del producto'})
     categoria.widget.attrs.update({'class': 'form-control', 'placeholder': 'Categoría del producto'})
     precio.widget.attrs.update({'class': 'form-control', 'placeholder': 'Precio del producto'})
