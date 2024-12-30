@@ -3,11 +3,11 @@ from .models import Productos
 
 # Definimos las opciones
 talla_choices = [
-    ('XS', 'Extra Small'),
-    ('S', 'Small'),
-    ('M', 'Medium'),
-    ('L', 'Large'),
-    ('XL', 'Extra Large'),
+    ('XS', 'XS'),
+    ('S', 'S'),
+    ('M', 'M'),
+    ('L', 'L'),
+    ('XL', 'XL'),
 ]
 
 categoria_choices = [
