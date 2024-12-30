@@ -80,8 +80,9 @@ def inventario(request):
         # Registrar el movimiento
         Movimiento.objects.create(
             nombre=producto.nombre,
-            talla=producto.talla,
+            descripcion=producto.descripcion,
             categoria=producto.categoria,
+            talla=producto.talla,
             precio=producto.precio,
             stock=nuevo_stock,
             accion="Ajuste de Stock"
@@ -107,7 +108,7 @@ def inventarioEmp(request):
     productos = []
     if categoria_seleccionada == 'Pantalones':
         productos = Productos.objects.all()
-    elif categoria_seleccionada == 'Camisetas':
+    elif categoria_seleccionada == 'Poleras':
         productos = Productos.objects.all()
     elif categoria_seleccionada == 'Zapatos':
         productos = Productos.objects.all()
@@ -128,8 +129,9 @@ def inventarioEmp(request):
         # Registrar el movimiento de "actualización de stock" en la tabla Movimiento
         Movimiento.objects.create(
             nombre=producto.nombre,
-            talla=producto.talla,
+            descripcion=producto.descripcion,
             categoria=producto.categoria,
+            talla=producto.talla,
             precio=producto.precio,
             stock=nuevo_stock,
             accion="Ajuste Stock"  # Tipo de acción	
@@ -171,8 +173,8 @@ def agregarProducto(request):
             # Registrar el movimiento de "agregar" en la tabla Movimiento
             Movimiento.objects.create(
                 nombre=nuevo_producto.nombre,
-                talla=nuevo_producto.talla,
                 categoria=nuevo_producto.categoria,
+                talla=nuevo_producto.talla,
                 precio=nuevo_producto.precio,
                 stock=nuevo_producto.stock,
                 accion="Agregar"  # Tipo de acción

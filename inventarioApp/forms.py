@@ -42,8 +42,8 @@ class LoginForm(forms.Form):
 class productosForm(forms.Form):
     nombre = forms.CharField(max_length=100)
     descripcion = forms.CharField(max_length=200)
-    talla = forms.ChoiceField(choices=talla_choices)  
     categoria = forms.ChoiceField(choices=categoria_choices)
+    talla = forms.ChoiceField(choices=talla_choices)  
     precio = forms.IntegerField()    
     stock = forms.IntegerField()
 
