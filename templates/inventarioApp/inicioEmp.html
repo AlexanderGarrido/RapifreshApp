@@ -90,22 +90,39 @@
   <!-- Barra superior -->
   <header class="p-3 mb-3 border-bottom shadow-sm" style="background-color: #343A40;">
     <div class="container">
-      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a class="navbar-brand" href="{% url 'inicioEmp' %}" style="margin-left: -100px;">
-          <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" style="width: 80px; border-radius: 50%;">
+      <nav class="navbar navbar-expand-lg navbar-dark">
+        <!-- Logo -->
+        <a class="navbar-brand" href="{% url 'inicioEmp' %}">
+          <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid" style="width: 80px; border-radius: 50%;">
         </a>
-        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 ms-5">
-            <a href="{% url 'inventarioEmp' %}" class="nav-link px-2 link-light {% if request.path == '/inventarioEmp/' %}active{% endif %}">
-              Inventario
+  
+        <!-- Toggle button for small screens -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        
+  
+        <!-- Collapsible content -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0 text-center">
+            <li class="nav-item">
+              <a href="{% url 'inventarioEmp' %}" class="nav-link {% if request.path == '/inventarioEmp/' %}active{% endif %}">
+                Inventario
+              </a>
+            </li>
+          </ul>
+  
+          <!-- Logout -->
+          <div class="text-center mt-3 mt-lg-0">
+            <a class="nav-link px-2 link-light" href="{% url 'login' %}">
+              Cerrar sesión <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
             </a>
-          </li>
-        </ul>
-        <div class="text-end">
-          <a class="nav-link px-2 link-light" href="{% url 'login' %}">Cerrar sesión <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i></a>
+          </div>
         </div>
-      </div>
+      </nav>
     </div>
   </header>
+  
 
   <!-- Contenido principal -->
   <div class="container-fluid p-4">
