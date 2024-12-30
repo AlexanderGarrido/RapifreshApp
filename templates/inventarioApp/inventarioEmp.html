@@ -1,12 +1,16 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
   {% load static %}
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Inventario</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mi Tienda 😁</title>
+  <!-- CSS de BS5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <!-- CSS DATATABLE -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
     html,
@@ -68,56 +72,51 @@
       padding: 1rem;
       margin-top: auto;
     }
+
+    .nav-link.active {
+      font-weight: bold;
+      background-color: #495057;
+      color: #ffe9cc;
+    }
   </style>
 </head>
 
 <body>
   <!-- Barra superior -->
-  <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'inicio' %}">
-        <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" style="width: 80px; border-radius: 50%;"> AMISTORE
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a href="{% url 'login' %}" class="nav-link"><i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar
-              Sesión</a>
+  <header class="p-3 mb-3 border-bottom shadow-sm" style="background-color: #343A40;">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <a class="navbar-brand" href="{% url 'inicioEmp' %}" style="margin-left: -100px;">
+          <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" style="width: 80px; border-radius: 50%;">
+        </a>
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 ms-5">
+            <a href="{% url 'inventarioEmp' %}" class="nav-link px-2 link-light {% if request.path == '/inventarioEmp/' %}active{% endif %}">
+              Inventario
+            </a>
           </li>
         </ul>
+        <div class="text-end">
+          <a class="nav-link px-2 link-light" href="{% url 'login' %}">Cerrar sesión <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i></a>
+        </div>
       </div>
     </div>
-  </nav>
-
-  <!-- Contenido principal -->
+  </header>
+  <!-- Contenedor Principal -->
   <div class="container-fluid p-4">
     <div class="d-flex justify-content-between align-items-center">
       <h1 class="mb-0">Gestión de Inventario</h1>
     </div>
 
-    <div class="alert alert-info mt-4" role="alert">
-      <i class="fa-solid fa-info-circle"></i> Bienvenido a la gestión de inventario.
-    </div>
-
-    <div style="text-align: end">
-      <a href="{% url 'agregarProducto' %}" class="btn btn-primary">
-        <i class="fa-solid fa-plus"></i>
-        Agregar Producto
-      </a>
-    </div>
-
-    <div class="table-responsive mt-4">
+    <!-- Tabla estilo DataTables -->
+    <div class="table-responsive">
       <table id="example" class="table table-striped table-bordered" style="width: 100%">
         <thead>
           <tr class="table-primary">
             <th>ID</th>
             <th>Nombre</th>
             <th>Descripción</th>
-            <th>Talla</th>
             <th>Categoría</th>
+            <th>Talla</th>
             <th>Precio</th>
             <th>Stock</th>
             <th>Acciones</th>
@@ -125,151 +124,106 @@
         </thead>
         <tbody>
           {% if productos %}
-          {% for producto in productos %}
-          <tr>
-            <td>{{ producto.id }}</td>
-            <td>{{ producto.nombre }}</td>
-            <td>{{ producto.descripcion }}</td>
-            <td>{{ producto.talla }}</td>
-            <td>{{ producto.categoria }}</td>
-            <td>${{ producto.precio }}</td>
-            <td>{{ producto.stock }}</td>
-            <td style="text-align: center">
-              <button data-bs-toggle="modal" data-bs-target="#addProductModal" class="add-button btn btn-primary"
-                data-id="{{ producto.id }}">
-                <i class="fa-solid fa-pen"></i>
-              </button>
-              <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                data-bs-target="#exampleModal{{ producto.id }}"><i class="bi bi-trash"></i>
-              </button>
-            </td>
-            <div class="modal fade" id="exampleModal{{ producto.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
-              aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Eliminar producto</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <p>¿Estás seguro de que deseas eliminar el producto {{producto.id}}?</p>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <a type="button" href="{% url 'eliminarProducto' producto.id %}" class="btn btn-danger">Eliminar</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </tr>
-          {% endfor %}
+            {% for producto in productos %}
+              <tr class="{% if producto.stock <= 3 %}table-danger{% elif producto.stock >= 4 and producto.stock <= 8 %}table-warning{% else %}table-light{% endif %}">
+                <th scope="row">{{ producto.id }}</th>
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.descripcion }}</td>
+                <td>{{ producto.talla }}</td>
+                <td>{{ producto.categoria }}</td>
+                <td>${{ producto.precio }}</td>
+                <td>{{ producto.stock }}</td>
+                <td style="text-align: center">
+                  <button
+                    data-bs-toggle="modal"
+                    data-bs-target="#updateStock"
+                    class="add-button btn btn-primary"
+                    data-id="{{ producto.id }}"
+                  >
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                </td>
+              </tr>
+            {% endfor %}
           {% else %}
-          <tr>
-            <td colspan="8" class="text-center">No hay productos registrados</td>
-          </tr>
+            <tr>
+              <td colspan="8" class="text-center">
+                No hay productos registrados
+              </td>
+            </tr>
           {% endif %}
         </tbody>
+        
       </table>
-      <div class="d-flex justify-content-initial mb-2 mt-4 ms-2">
-        <a href="{% url 'inicio' %}" class="btn btn-danger"><i class="fa-solid fa-arrow-left"></i> Volver</a>
-      </div>
     </div>
   </div>
-  <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+
+  <!--Modal de Ajustar Stock-->
+  <div class="modal fade" id="updateStock" tabindex="-1" aria-labelledby="updateStockModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="addProductModalLabel">
-            Modificar stock
+          <h5 class="modal-title" id="updateStockModalLabel">
+            Ajustar Stock
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form method="post" class="col-12 border border-info rounded p-4" id="addProductForm">
             {% csrf_token %}
-
-            <!-- Campo de ID del Producto -->
-            <div class="mb-3 row">
-              <label for="productId" class="col-sm-4 col-form-label">ID</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productId" name="id" readonly />
-              </div>
-            </div>
-
-            <!-- Campo de Nombre -->
             <div class="mb-3 row">
               <label for="productName" class="col-sm-4 col-form-label">Nombre</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="productName" name="nombre" />
+                <input type="text" class="form-control" id="productName" name="nombre" disabled readonly />
               </div>
             </div>
-
-            <!-- Campo de Descripción -->
-            <div class="mb-3 row">
-              <label for="productDescripcion" class="col-sm-4 col-form-label">Descripción</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productDescripcion" name="descripcion" />
-              </div>
-            </div>
-
-            <!-- Campo de Color -->
             <div class="mb-3 row">
               <label for="productColor" class="col-sm-4 col-form-label">Color</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="productColor" name="color" />
+                <input type="text" class="form-control" id="productColor" name="color" disabled readonly />
               </div>
             </div>
-
-            <!-- Campo de Talla -->
             <div class="mb-3 row">
               <label for="productSize" class="col-sm-4 col-form-label">Talla</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="productSize" name="talla" />
+                <input type="text" class="form-control" id="productSize" name="talla" disabled readonly />
               </div>
             </div>
-
-            <!-- Campo de Categoría -->
             <div class="mb-3 row">
               <label for="productCategory" class="col-sm-4 col-form-label">Categoría</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="productCategory" name="categoria" />
+                <input type="text" class="form-control" id="productCategory" name="categoria" disabled readonly />
               </div>
             </div>
-
-            <!-- Campo de Precio -->
             <div class="mb-3 row">
               <label for="productPrice" class="col-sm-4 col-form-label">Precio</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="productPrice" name="precio" />
+                <input type="text" class="form-control" id="productPrice" name="precio" disabled readonly />
               </div>
             </div>
-
-            <!-- Campo de Stock Actual (solo lectura) -->
             <div class="mb-3 row">
               <label for="productStock" class="col-sm-4 col-form-label">Stock actual</label>
               <div class="col-sm-8">
                 <input type="number" class="form-control" id="productStock" name="stock" disabled readonly />
               </div>
             </div>
-
-            <!-- Campo para Nuevo Stock -->
             <div class="mb-3 row">
-              <label for="productModificar" class="col-sm-4 col-form-label" style="font-weight: bold">Nuevo
-                stock</label>
+              <label for="productModificar" class="col-sm-4 col-form-label" style="font-weight: bold">Cantidad:</label>
               <div class="col-sm-8">
-                <input type="number" class="form-control" id="productModificar" name="nuevo_stock" />
+                <input type="number" class="form-control" id="productModificar" name="stock" />
               </div>
             </div>
-
           </form>
-          <input type="hidden" id="csrfToken" value="{{ csrf_token }}" />
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Cancelar
+            Cerrar
           </button>
-          <button type="button" class="btn btn-primary" id="addProductButton">
-            Guardar
+          <button type="button" class="btn btn-danger" onclick="adjustStock('decrement')">
+            Restar Stock
+          </button>
+          <button type="button" class="btn btn-success" onclick="adjustStock('increment')">
+            Sumar Stock
           </button>
         </div>
       </div>
@@ -277,7 +231,7 @@
   </div>
 
   <footer class="text-center py-3">
-    <small>Copyright © 2024 - Sistemas Web.</small>
+    <small>Copyright © 2024 AmiStore.</small>
   </footer>
 
   <!-- JS de BS5 -->
@@ -300,78 +254,76 @@
       });
     });
   </script>
-
   <!--ENVIAR LOS DATOS DEL PRODUCTO AL MODAL DE EDITAR-->
   <script>
     $(document).ready(function () {
-      // Llenar el formulario con los datos del producto cuando se abre el modal
-      $(".add-button").on("click", function () {
-        const row = $(this).closest("tr");
-        const productId = $(this).data("id");
+  // Llenar el formulario con los datos del producto cuando se abre el modal
+  $(".edit-button").on("click", function () {
+    const row = $(this).closest("tr");
+    const productId = $(this).data("id");
 
-        if (!productId) {
-          alert("Error: No se encontró el ID del producto.");
-          return; // Evita continuar si no hay un ID válido
-        }
+    // Validar que el ID del producto exista
+    if (!productId) {
+      alert("Error: No se encontró el ID del producto.");
+      return;
+    }
 
-        // Obtener los datos del producto (asegurándote de obtener el texto correctamente)
-        const productName = row.find("td:nth-child(2)").text(); // Nombre
-        const productDescripcion = row.find("td:nth-child(3)").text(); // Descripción
-        const productColor = row.find("td:nth-child(4)").text(); // Color
-        const productSize = row.find("td:nth-child(5)").text(); // Talla
-        const productCategory = row.find("td:nth-child(6)").text(); // Categoría
-        const productPrice = row.find("td:nth-child(7)").text(); // Precio
-        const productStock = row.find("td:nth-child(8)").text(); // Stock actual
+    // Obtener los datos del producto de la fila seleccionada
+    const productName = row.find("td:nth-child(2)").text(); // Nombre
+    const productCategory = row.find("td:nth-child(4)").text(); // Categoría
+    const productSize = row.find("td:nth-child(5)").text(); // Talla
+    const productPrice = row.find("td:nth-child(6)").text(); // Precio
+    const productStock = row.find("td:nth-child(7)").text(); // Stock actual
 
-        // Llenar el formulario con los datos
-        $("#productId").val(productId);
-        $("#productName").val(productName);
-        $("#productDescripcion").val(productDescripcion);
-        $("#productColor").val(productColor);
-        $("#productSize").val(productSize);
-        $("#productCategory").val(productCategory);
-        $("#productPrice").val(productPrice);
-        $("#productStock").val(productStock);
-        $("#productModificar").val(""); // Reiniciar el campo de nuevo stock
-      });
+    // Llenar los campos del formulario
+    $("#productName").val(productName);
+    $("#productCategory").val(productCategory);
+    $("#productSize").val(productSize);
+    $("#productPrice").val(productPrice);
+    $("#productStock").val(productStock);
+    $("#productModificar").val(""); // Reiniciar el campo de ajuste de stock
+  });
 
-      // Evento para manejar la acción de guardar cambios
-      $("#addProductButton").on("click", function () {
-        const productId = $("#productId").val();
-        const productName = $("#productName").val();
-        const productDescripcion = $("#productDescripcion").val();
-        const productColor = $("#productColor").val();
-        const productSize = $("#productSize").val();
-        const productCategory = $("#productCategory").val();
-        const productPrice = $("#productPrice").val();
-        const productStock = $("#productStock").val();
-        const productModificar = $("#productModificar").val();
+  // Ajustar el stock (Sumar o Restar)
+  window.adjustStock = function (action) {
+    const productId = $("#productId").val();
+    const currentStock = parseInt($("#productStock").val());
+    const modifyStock = parseInt($("#productModificar").val());
 
-        // Realizar la llamada AJAX para enviar los datos
-        $.ajax({
-          url: "/modificarProducto/" + productId + "/",
-          type: "POST",
-          data: {
-            nombre: productName,
-            descripcion: productDescripcion,
-            color: productColor,
-            talla: productSize,
-            categoria: productCategory,
-            precio: productPrice,
-            stock: productStock,
-            nuevo_stock: productModificar,
-            csrfmiddlewaretoken: "{{ csrf_token }}", // Token CSRF
-          },
-          success: function (result) {
-            // Si la actualización fue exitosa, recargar la página o actualizar la tabla
-            location.reload(); // O actualizar solo la fila modificada
-          },
-          error: function (xhr, status, error) {
-            alert("Error al actualizar el producto: " + error);
-          },
-        });
-      });
+    if (isNaN(modifyStock) || modifyStock <= 0) {
+      alert("Por favor, ingresa una cantidad válida para ajustar el stock.");
+      return;
+    }
+
+    const newStock =
+      action === "increment"
+        ? currentStock + modifyStock
+        : currentStock - modifyStock;
+
+    // Validar que el stock no quede negativo
+    if (newStock < 0) {
+      alert("El stock no puede ser negativo.");
+      return;
+    }
+
+    // Enviar los datos al servidor
+    $.ajax({
+      url: "/ajustarStock/" + productId + "/",
+      type: "POST",
+      data: {
+        stock: newStock,
+        csrfmiddlewaretoken: "{{ csrf_token }}", // Token CSRF
+      },
+      success: function (result) {
+        alert("Stock ajustado correctamente.");
+        location.reload(); // Recargar la página
+      },
+      error: function (xhr, status, error) {
+        alert("Error al ajustar el stock: " + error);
+      },
     });
+  };
+});
   </script>
 </body>
 
