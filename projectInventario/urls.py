@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from inventarioApp.views import *
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login_view, name='login'),
@@ -28,7 +29,7 @@ urlpatterns = [
     path('inicioEmp/', inventario_viewEmp, name='inicioEmp'),
     path('usuarios/', usuario, name='usuarios'),
     path('agregarProducto/', agregarProducto, name='agregarProducto'),
-    path('ajustarStock/<int:producto_id>/', ajustarStock, name='ajustarStock'),
+    path('ajusteStock/<int:producto_id>/', ajustarStock, name='ajustarStock'),
     path('modificarProducto/<int:producto_id>/', modificarProducto, name='modificarProducto'),
     path('eliminarProducto/<int:producto_id>/', eliminarProducto, name='eliminarProducto'),
 ]

@@ -7,8 +7,6 @@ class Productos(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=200)
     precio = models.IntegerField()    
-    stock = models.IntegerField()
-    talla = models.CharField(max_length=50, default='S')
     categoria_choices = (
         ('Pantalones', 'Pantalones'),
         ('Poleras', 'Poleras'),
@@ -22,7 +20,8 @@ class Productos(models.Model):
         ('XL', 'XL'),
         ('XXL', 'XXL'),
     )
-    talla = models.CharField(max_length=50, choices=talla_choices, default='S')
+    talla = models.CharField(max_length=50, default='S')
+    stock = models.IntegerField()
 
 class Usuarios(models.Model):
     email = models.EmailField(max_length=100, unique=True)

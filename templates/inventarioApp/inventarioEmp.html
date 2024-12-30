@@ -140,6 +140,7 @@
                     data-bs-target="#updateStock"
                     class="add-button btn btn-primary"
                     data-id="{{ producto.id }}"
+                    data-stock="{{ producto.stock }}"
                   >
                     <i class="fa-solid fa-pen"></i>
                   </button>
@@ -164,68 +165,26 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="updateStockModalLabel">
-            Ajustar Stock
-          </h5>
+          <h5 class="modal-title">Ajustar Stock</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form method="post" class="col-12 border border-info rounded p-4" id="addProductForm">
+          <form id="stockForm">
             {% csrf_token %}
-            <div class="mb-3 row">
-              <label for="productName" class="col-sm-4 col-form-label">Nombre</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productName" name="nombre" disabled readonly />
-              </div>
+            <input type="hidden" id="productId" />
+            <div class="mb-3">
+              <label for="productStock" class="form-label">Stock actual:</label>
+              <input type="number" class="form-control" id="productStock" readonly />
             </div>
-            <div class="mb-3 row">
-              <label for="productColor" class="col-sm-4 col-form-label">Color</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productColor" name="color" disabled readonly />
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label for="productSize" class="col-sm-4 col-form-label">Talla</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productSize" name="talla" disabled readonly />
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label for="productCategory" class="col-sm-4 col-form-label">Categoría</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productCategory" name="categoria" disabled readonly />
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label for="productPrice" class="col-sm-4 col-form-label">Precio</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productPrice" name="precio" disabled readonly />
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label for="productStock" class="col-sm-4 col-form-label">Stock actual</label>
-              <div class="col-sm-8">
-                <input type="number" class="form-control" id="productStock" name="stock" disabled readonly />
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label for="productModificar" class="col-sm-4 col-form-label" style="font-weight: bold">Cantidad:</label>
-              <div class="col-sm-8">
-                <input type="number" class="form-control" id="productModificar" name="stock" />
-              </div>
+            <div class="mb-3">
+              <label for="stockAdjustment" class="form-label">Ajuste de cantidad:</label>
+              <input type="number" class="form-control" id="stockAdjustment" required />
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Cerrar
-          </button>
-          <button type="button" class="btn btn-danger" onclick="adjustStock('decrement')">
-            Restar Stock
-          </button>
-          <button type="button" class="btn btn-success" onclick="adjustStock('increment')">
-            Sumar Stock
-          </button>
+          <button type="button" class="btn btn-danger" onclick="adjustStock('decrement')">Restar Stock</button>
+          <button type="button" class="btn btn-success" onclick="adjustStock('increment')">Sumar Stock</button>
         </div>
       </div>
     </div>
@@ -255,76 +214,68 @@
       });
     });
   </script>
+
   <!--ENVIAR LOS DATOS DEL PRODUCTO AL MODAL DE EDITAR-->
   <script>
-    $(document).ready(function () {
+    document.addEventListener("DOMContentLoaded", () => {
   // Llenar el formulario con los datos del producto cuando se abre el modal
-  $(".edit-button").on("click", function () {
-    const row = $(this).closest("tr");
-    const productId = $(this).data("id");
+    document.querySelectorAll(".add-button").forEach(button => {
+      button.addEventListener("click", () => {
+        const productId = button.dataset.id;
+        const stock = button.dataset.stock;
+        const name = button.dataset.name;
+        const category = button.dataset.category;
+        const size = button.dataset.size;
+        const price = button.dataset.price;
 
-    // Validar que el ID del producto exista
-    if (!productId) {
-      alert("Error: No se encontró el ID del producto.");
-      return;
-    }
-
-    // Obtener los datos del producto de la fila seleccionada
-    const productName = row.find("td:nth-child(2)").text(); // Nombre
-    const productCategory = row.find("td:nth-child(4)").text(); // Categoría
-    const productSize = row.find("td:nth-child(5)").text(); // Talla
-    const productPrice = row.find("td:nth-child(6)").text(); // Precio
-    const productStock = row.find("td:nth-child(7)").text(); // Stock actual
-
-    // Llenar los campos del formulario
-    $("#productName").val(productName);
-    $("#productCategory").val(productCategory);
-    $("#productSize").val(productSize);
-    $("#productPrice").val(productPrice);
-    $("#productStock").val(productStock);
-    $("#productModificar").val(""); // Reiniciar el campo de ajuste de stock
-  });
-
-  // Ajustar el stock (Sumar o Restar)
-  window.adjustStock = function (action) {
-    const productId = $("#productId").val();
-    const currentStock = parseInt($("#productStock").val());
-    const modifyStock = parseInt($("#productModificar").val());
-
-    if (isNaN(modifyStock) || modifyStock <= 0) {
-      alert("Por favor, ingresa una cantidad válida para ajustar el stock.");
-      return;
-    }
-
-    const newStock =
-      action === "increment"
-        ? currentStock + modifyStock
-        : currentStock - modifyStock;
-
-    // Validar que el stock no quede negativo
-    if (newStock < 0) {
-      alert("El stock no puede ser negativo.");
-      return;
-    }
-
-    // Enviar los datos al servidor
-    $.ajax({
-      url: "/ajustarStock/" + productId + "/",
-      type: "POST",
-      data: {
-        stock: newStock,
-        csrfmiddlewaretoken: "{{ csrf_token }}", // Token CSRF
-      },
-      success: function (result) {
-        alert("Stock ajustado correctamente.");
-        location.reload(); // Recargar la página
-      },
-      error: function (xhr, status, error) {
-        alert("Error al ajustar el stock: " + error);
-      },
+        // Asignar los valores a los campos del modal
+        document.getElementById("productId").value = productId;
+        document.getElementById("productStock").value = stock;
+        document.getElementById("productName").value = name;
+        document.getElementById("productCategory").value = category;
+        document.getElementById("productSize").value = size;
+        document.getElementById("productPrice").value = price;
+      });
     });
-  };
-});
+  });
+  
+    function adjustStock(action) {
+      const productId = document.getElementById("productId").value;
+      const currentStock = parseInt(document.getElementById("productStock").value);
+      const adjustment = parseInt(document.getElementById("stockAdjustment").value);
+  
+      if (isNaN(adjustment) || adjustment <= 0) {
+        alert("Por favor, introduce una cantidad válida.");
+        return;
+      }
+  
+      const newStock = action === "increment" ? currentStock + adjustment : currentStock - adjustment;
+  
+      if (newStock < 0) {
+        alert("El stock no puede ser negativo.");
+        return;
+      }
+  
+      fetch(`/ajusteStock/${productId}/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: JSON.stringify({ adjustment: action === "increment" ? adjustment : -adjustment }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            location.reload();
+          } else {
+            alert("Error al ajustar el stock: " + data.message);
+          }
+        })
+        .catch(error => {
+          alert("Error en la solicitud: " + error);
+        });
+    }
   </script>
 </body>
 

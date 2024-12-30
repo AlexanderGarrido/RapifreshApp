@@ -142,19 +142,19 @@
                 <th scope="row">{{ producto.id }}</th>
                 <td>{{ producto.nombre }}</td>
                 <td>{{ producto.descripcion }}</td>
-                <td>{{ producto.talla }}</td>
                 <td>{{ producto.categoria }}</td>
+                <td>{{ producto.talla }}</td>
                 <td>${{ producto.precio }}</td>
                 <td>{{ producto.stock }}</td>
                 <td style="text-align: center">
-                  <button
-                    data-bs-toggle="modal"
-                    data-bs-target="#addProductModal"
-                    class="add-button btn btn-primary"
-                    data-id="{{ producto.id }}"
-                  >
-                    <i class="fa-solid fa-pen"></i>
-                  </button>
+                <button
+                  data-bs-toggle="modal"
+                  data-bs-target="#editProductModal"
+                  class="edit-button btn btn-primary"
+                  data-id="{{ producto.id }}"
+                >
+                  <i class="fa-solid fa-pen"></i>
+                </button>
                   <button
                     type="button"
                     class="btn btn-danger"
@@ -223,102 +223,63 @@
       </table>
     </div>
   </div>
-  <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+<!-- Modal de Editar Producto -->
+  <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="addProductModalLabel">
-            Modificar stock
-          </h5>
+          <h5 class="modal-title" id="editProductModalLabel">Editar Producto</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form method="post" class="col-12 border border-info rounded p-4" id="addProductForm">
+          <form id="editProductForm">
             {% csrf_token %}
+            <input type="hidden" id="productId" name="id">
 
-            <!-- Campo de ID del Producto -->
-            <div class="mb-3 row">
-              <label for="productId" class="col-sm-4 col-form-label">ID</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productId" name="id" readonly />
-              </div>
+            <div class="mb-3">
+              <label for="editProductName" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="editProductName" name="nombre" required>
             </div>
 
-            <!-- Campo de Nombre -->
-            <div class="mb-3 row">
-              <label for="productName" class="col-sm-4 col-form-label">Nombre</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productName" name="nombre" />
-              </div>
+            <div class="mb-3">
+              <label for="editProductDescripcion" class="form-label">Descripción</label>
+              <input type="text" class="form-control" id="editProductDescripcion" name="descripcion" required>
             </div>
 
-            <!-- Campo de Descripción -->
-            <div class="mb-3 row">
-              <label for="productDescripcion" class="col-sm-4 col-form-label">Descripción</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productDescripcion" name="descripcion" />
-              </div>
+            <div class="mb-3">
+              <label for="editProductCategory" class="form-label">Categoría</label>
+              <select class="form-control" id="editProductCategory" name="categoria" required>
+                <option value="Polera">Polera</option>
+                <option value="Pantalones">Pantalones</option>
+                <option value="Zapatos">Zapatos</option>
+              </select>
             </div>
 
-            <!-- Campo de Color -->
-            <div class="mb-3 row">
-              <label for="productColor" class="col-sm-4 col-form-label">Color</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productColor" name="color" />
-              </div>
+            <div class="mb-3">
+              <label for="editProductSize" class="form-label">Talla</label>
+              <select class="form-control" id="editProductSize" name="talla" required>
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+              </select>
             </div>
 
-            <!-- Campo de Talla -->
-            <div class="mb-3 row">
-              <label for="productSize" class="col-sm-4 col-form-label">Talla</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productSize" name="talla" />
-              </div>
+            <div class="mb-3">
+              <label for="editProductPrice" class="form-label">Precio</label>
+              <input type="number" step="0.01" class="form-control" id="editProductPrice" name="precio" required>
             </div>
 
-            <!-- Campo de Categoría -->
-            <div class="mb-3 row">
-              <label for="productCategory" class="col-sm-4 col-form-label">Categoría</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productCategory" name="categoria" />
-              </div>
+            <div class="mb-3">
+              <label for="editProductStock" class="form-label">Stock</label>
+              <input type="number" class="form-control" id="editProductStock" name="stock"  required>
             </div>
-
-            <!-- Campo de Precio -->
-            <div class="mb-3 row">
-              <label for="productPrice" class="col-sm-4 col-form-label">Precio</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="productPrice" name="precio" />
-              </div>
-            </div>
-
-            <!-- Campo de Stock Actual (solo lectura) -->
-            <div class="mb-3 row">
-              <label for="productStock" class="col-sm-4 col-form-label">Stock actual</label>
-              <div class="col-sm-8">
-                <input type="number" class="form-control" id="productStock" name="stock" disabled readonly />
-              </div>
-            </div>
-
-            <!-- Campo para Nuevo Stock -->
-            <div class="mb-3 row">
-              <label for="productModificar" class="col-sm-4 col-form-label" style="font-weight: bold">Nuevo
-                stock</label>
-              <div class="col-sm-8">
-                <input type="number" class="form-control" id="productModificar" name="nuevo_stock" />
-              </div>
-            </div>
-
           </form>
-          <input type="hidden" id="csrfToken" value="{{ csrf_token }}" />
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Cancelar
-          </button>
-          <button type="button" class="btn btn-primary" id="addProductButton">
-            Guardar
-          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="saveProductChanges">Guardar Cambios</button>
         </div>
       </div>
     </div>
@@ -350,73 +311,48 @@
   </script>
 
   <!--ENVIAR LOS DATOS DEL PRODUCTO AL MODAL DE EDITAR-->
-  <script>
+<script>
     $(document).ready(function () {
-      // Llenar el formulario con los datos del producto cuando se abre el modal
-      $(".add-button").on("click", function () {
-        const row = $(this).closest("tr");
+      // Llenar datos en el modal de edición
+      $(".edit-button").on("click", function () {
         const productId = $(this).data("id");
-
-        if (!productId) {
-          alert("Error: No se encontró el ID del producto.");
-          return; // Evita continuar si no hay un ID válido
-        }
-
-        // Obtener los datos del producto (asegurándote de obtener el texto correctamente)
-        const productName = row.find("td:nth-child(2)").text(); // Nombre
-        const productDescripcion = row.find("td:nth-child(3)").text(); // Descripción
-        const productCategory = row.find("td:nth-child(6)").text(); // Categoría
-        const productSize = row.find("td:nth-child(5)").text(); // Talla
-        const productPrice = row.find("td:nth-child(7)").text(); // Precio
-        const productStock = row.find("td:nth-child(8)").text(); // Stock actual
-
-        // Llenar el formulario con los datos
+  
+        // Encontrar el row asociado al botón
+        const row = $(this).closest("tr");
+  
+        // Rellenar los campos del formulario con los datos de la fila
         $("#productId").val(productId);
-        $("#productName").val(productName);
-        $("#productDescripcion").val(productDescripcion);
-        $("#productCategory").val(productCategory);
-        $("#productSize").val(productSize);
-        $("#productPrice").val(productPrice);
-        $("#productStock").val(productStock);
-        $("#productModificar").val(""); // Reiniciar el campo de nuevo stock
+        $("#editProductName").val(row.find("td:nth-child(2)").text().trim());
+        $("#editProductDescripcion").val(row.find("td:nth-child(3)").text().trim());
+        $("#editProductCategory").val(row.find("td:nth-child(4)").text().trim());
+        $("#editProductSize").val(row.find("td:nth-child(5)").text().trim());
+        $("#editProductPrice").val(row.find("td:nth-child(6)").text().trim());
+        $("#editProductStock").val(row.find("td:nth-child(7)").text().trim());
       });
-
-      // Evento para manejar la acción de guardar cambios
-      $("#addProductButton").on("click", function () {
-        const productId = $("#productId").val();
-        const productName = $("#productName").val();
-        const productDescripcion = $("#productDescripcion").val();
-        const productCategory = $("#productCategory").val();
-        const productSize = $("#productSize").val();
-        const productPrice = $("#productPrice").val();
-        const productStock = $("#productStock").val();
-        const productModificar = $("#productModificar").val();
-
-        // Realizar la llamada AJAX para enviar los datos
+  
+      // Guardar cambios del producto
+      $("#saveProductChanges").on("click", function () {
+        const formData = $("#editProductForm").serialize();
+  
         $.ajax({
-          url: "/modificarProducto/" + productId + "/",
+          url: `/modificarProducto/${$("#productId").val()}/`,
           type: "POST",
-          data: {
-            nombre: productName,
-            descripcion: productDescripcion,
-            categoria: productCategory,
-            talla: productSize,
-            precio: productPrice,
-            stock: productStock,
-            nuevo_stock: productModificar,
-            csrfmiddlewaretoken: "{{ csrf_token }}", // Token CSRF
+          data: formData,
+          success: function (response) {
+            if (response.success) {
+              location.reload(); // Recargar página para reflejar cambios
+            } else {
+              alert("Error al actualizar el producto: " + response.error);
+            }
           },
-          success: function (result) {
-            // Si la actualización fue exitosa, recargar la página o actualizar la tabla
-            location.reload(); // O actualizar solo la fila modificada
-          },
-          error: function (xhr, status, error) {
-            alert("Error al actualizar el producto: " + error);
+          error: function () {
+            alert("Ocurrió un error inesperado. Intenta nuevamente.");
           },
         });
       });
     });
-  </script>
+</script>
+</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -449,7 +385,7 @@
       doc.text("Reportes Diarios - AmiStore", 70, 20);
 
       // Tabla
-      const table = document.querySelector("#example");
+      const table = document.querySelector("#tableApp");
       doc.autoTable({
         html: table,
         startY: pdfHeight + 20,

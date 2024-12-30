@@ -10,6 +10,8 @@ from datetime import datetime
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+import json
+
 
 #login de inicio de sesion
 def login_view(request):
@@ -85,7 +87,7 @@ def inventario(request):
             talla=producto.talla,
             precio=producto.precio,
             stock=nuevo_stock,
-            accion="Ajuste de Stock"
+            accion="Ajuste de Stock (Jefe)"
         )
 
         return redirect('inventario')
@@ -134,7 +136,7 @@ def inventarioEmp(request):
             talla=producto.talla,
             precio=producto.precio,
             stock=nuevo_stock,
-            accion="Ajuste Stock"  # Tipo de acción	
+            accion="Ajuste Stock (Empleado)"  # Tipo de acción	
         )
 
         # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
@@ -177,7 +179,7 @@ def agregarProducto(request):
                 talla=nuevo_producto.talla,
                 precio=nuevo_producto.precio,
                 stock=nuevo_producto.stock,
-                accion="Agregar"  # Tipo de acción
+                accion="Agregar (Jefe)"  # Tipo de acción
             )
 
             return HttpResponseRedirect(reverse('inventario'))
@@ -203,29 +205,49 @@ def reports(request):
 
     return render(request, 'inventarioApp/reports.html', {'movimientos': movimientos})
 
-# Ajustar el stock de un producto
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Productos, Movimiento
+
 def ajustarStock(request, producto_id):
     if request.method == "POST":
-        adjustment = int(request.POST.get("adjustment", 0))
-        producto = get_object_or_404(Productos, id=producto_id)
+        try:
+            # Leer y validar datos
+            data = json.loads(request.body)
+            adjustment = int(data.get("adjustment", 0))
+            
+            if adjustment == 0:
+                return JsonResponse({"status": "error", "message": "El ajuste no puede ser cero."}, status=400)
 
-        # Ajustar el stock
-        producto.stock += adjustment
-        producto.save()
+            producto = get_object_or_404(Productos, id=producto_id)
+            new_stock = producto.stock + adjustment
 
-        # Registrar el movimiento de "ajuste" en la tabla Movimiento
-        Movimiento.objects.create(
-            nombre=producto.nombre,
-            talla=producto.talla,
-            categoria=producto.categoria,
-            precio=producto.precio,
-            stock=producto.stock,
-            accion="Ajuste Stock"  # Tipo de acción
-        )
-        
-        return JsonResponse({"status": "success", "new_stock": producto.stock})
-    
-    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
+            if new_stock < 0:
+                return JsonResponse({"status": "error", "message": "El stock no puede ser negativo."}, status=400)
+
+            # Actualizar el stock
+            producto.stock = new_stock
+            producto.save()
+
+            # Registrar el movimiento
+            Movimiento.objects.create(
+                nombre=producto.nombre,
+                categoria=producto.categoria,
+                talla=producto.talla,
+                precio=producto.precio,
+                stock=producto.stock,
+                accion="Ajuste"
+            )
+
+            return JsonResponse({"status": "success", "stock": producto.stock})
+
+        except ValueError:
+            return JsonResponse({"status": "error", "message": "Datos inválidos."}, status=400)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+    return JsonResponse({"status": "error", "message": "Método no permitido."}, status=405)
+
 
 # Modificar un producto
 def modificarProducto(request, producto_id):
@@ -237,23 +259,18 @@ def modificarProducto(request, producto_id):
             # Capturar los datos enviados en la solicitud
             nombre = request.POST.get('nombre')
             descripcion = request.POST.get('descripcion')
-            talla = request.POST.get('talla')
             categoria = request.POST.get('categoria')
+            talla = request.POST.get('talla')
             precio = request.POST.get('precio')
-            nuevo_stock = request.POST.get('nuevo_stock')
+            stock = request.POST.get('stock')
             
-            # Mensajes de depuración
-            print(f"Datos recibidos: Nombre: {nombre}, Descripción: {descripcion}, Talla: {talla}, Categoria: {categoria}, Precio: {precio}, Stock: {nuevo_stock}")
-
             # Validar que los datos no están vacíos
             producto.nombre = nombre or producto.nombre
             producto.descripcion = descripcion or producto.descripcion
-            producto.talla = talla or producto.talla
             producto.categoria = categoria or producto.categoria
+            producto.talla = talla or producto.talla
             producto.precio = float(precio) if precio else producto.precio
-
-            if nuevo_stock:
-                producto.stock = int(nuevo_stock)  # Convertir a entero
+            producto.stock = int(stock) if stock else producto.stock
 
             # Guardar cambios en la base de datos
             producto.save()
@@ -261,11 +278,11 @@ def modificarProducto(request, producto_id):
             # Registrar el movimiento de "modificación" en la tabla Movimiento
             Movimiento.objects.create(
                 nombre=producto.nombre,
-                talla=producto.talla,
                 categoria=producto.categoria,
+                talla=producto.talla,
                 precio=producto.precio,
                 stock=producto.stock,
-                accion="Modificación"  # Tipo de acción
+                accion="Modificación (Jefe)"  # Tipo de acción
             )
 
             return JsonResponse({'success': True})
@@ -287,7 +304,7 @@ def eliminarProducto(request, producto_id):
         categoria=producto.categoria,
         precio=producto.precio,
         stock=producto.stock,
-        accion="Eliminación"  # Tipo de acción
+        accion="Eliminación (Jefe)"  # Tipo de acción
     )
     return HttpResponseRedirect(reverse('inventario'))
     
