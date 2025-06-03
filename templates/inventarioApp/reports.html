@@ -1,288 +1,166 @@
-<!doctype html>
-<html lang="en">
+{% extends 'inventarioApp/base.html' %}
+{% load static %}
 
-<head>
-  {% load static %}
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Inventario</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block title %}Reportes de Movimientos - Rapifresh{% endblock %}
+
+{% block extra_head %}
   <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-    }
+{% endblock %}
 
-    body {
-      display: flex;
-      flex-direction: column;
-      background-color: #ffe9cc;
-      color: #495057;
-    }
-
-    .navbar {
-      background-color: #343A40;
-      color: #FFFFFF;
-    }
-
-    .navbar .nav-link {
-      color: #FFFFFF;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .navbar .nav-link:hover {
-      background-color: #495057;
-      color: #ffe9cc;
-    }
-
-    .btn-primary {
-      background-color: #cfa266;
-      border-color: #b88d4d;
-    }
-
-    .btn-primary:hover {
-      background-color: #da9b3c;
-      border-color: #cfb22e;
-    }
-
-    .table thead {
-      background-color: #cfa266;
-      color: #FFFFFF;
-    }
-
-    .table tbody tr:nth-child(odd) {
-      background-color: #f8f9fa;
-    }
-
-    .table tbody tr:nth-child(even) {
-      background-color: #ffffff;
-    }
-
-    footer {
-      background-color: #343A40;
-      color: #FFFFFF;
-      border-top: 2px solid #FFC107;
-      text-align: center;
-      padding: 1rem;
-      margin-top: auto;
-    }
-    .nav-link.active {
-      font-weight: bold;
-      background-color: #495057;
-      color: #ffe9cc;
-      border-radius: 10px;
-    }
-  </style>
-</head>
-</head>
-
-<body>
-  <!-- Barra superior -->
-  <header class="p-3 mb-3 border-bottom shadow-sm" style="background-color: #343A40;">
-    <div class="container">
-      <nav class="navbar navbar-expand-lg navbar-dark">
-        <!-- Logo -->
-        <a class="navbar-brand" href="{% url 'inicio' %}">
-          <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid" style="width: 80px; border-radius: 50%;">
-        </a>
-  
-        <!-- Toggle button for small screens -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        
-  
-        <!-- Collapsible content -->
-        <div class="collapse navbar-collapse" id="navbarContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0 text-center">
-            <li class="nav-item">
-              <a href="{% url 'reports' %}" class="nav-link {% if request.path == '/reports/' %}active{% endif %}">
-                Reportes
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'usuarios' %}" class="nav-link {% if request.path == '/usuarios/' %}active{% endif %}">
-                Usuarios
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'inventario' %}" class="nav-link {% if request.path == '/inventario/' %}active{% endif %}">
-                Inventario
-              </a>
-            </li>
-          </ul>
-  
-          <!-- Logout -->
-          <div class="text-center mt-3 mt-lg-0">
-            <a class="nav-link px-2 link-light" href="{% url 'login' %}">
-              Cerrar sesión <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-            </a>
-          </div>
-        </div>
-      </nav>
-    </div>
-  </header>
-  
-
-  <!-- Contenido principal -->
-  <div class="container-fluid p-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-center text-md-start">
-      <h1 class="mb-3 mb-md-0">Gestión de Reportes</h1>
-      <div class="d-flex flex-column flex-sm-row gap-2">
-        <button id="exportPdf" class="btn btn-danger"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
-        <button id="exportExcel" class="btn btn-success"><i class="fas fa-file-excel"></i> Exportar Excel</button>
-      </div>
-    </div>
-    
-
-    <!-- Filtros de Reporte -->
-    <form method="get" class="mb-3">
-      <div class="row">
-          <div class="col-md-4">
-              <label for="startDate" class="form-label">Fecha de inicio</label>
-              <input type="date" id="startDate" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
-          </div>
-          <div class="col-md-4">
-              <label for="endDate" class="form-label">Fecha de fin</label>
-              <input type="date" id="endDate" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
-          </div>
-          <div class="col-md-4">
-              <label for="actionType" class="form-label">Tipo de Acción</label>
-              <select id="actionType" name="action_type" class="form-select">
-                  <option value="" {% if not request.GET.action_type %}selected{% endif %}>Todos</option>
-                  <option value="Agregar" {% if request.GET.action_type == "Agregar" %}selected{% endif %}>Agregar</option>
-                  <option value="Ajuste Stock" {% if request.GET.action_type == "Ajuste Stock" %}selected{% endif %}>Ajuste de Stock</option>
-                  <option value="Eliminación" {% if request.GET.action_type == "Eliminación" %}selected{% endif %}>Eliminación</option>
-              </select>
-          </div>
-      </div>
-      <button type="submit" class="btn btn-primary mt-3">Aplicar Filtros</button>
-    </form>
-
-    <!-- Tabla de Movimientos de Inventario -->
-    <div class="table-responsive mt-4">
-      <table id="example" class="table table-striped table-bordered" style="width: 100%">
-          <thead>
-              <tr class="table-primary">
-                  <th>Nombre</th>
-                  <th>Talla</th>
-                  <th>Categoria</th>
-                  <th>Precio</th>
-                  <th>Stock</th>
-                  <th>Acción</th> <!-- Muestra el tipo de movimiento -->
-                  <th>Fecha</th> <!-- Fecha del movimiento -->
-              </tr>
-          </thead>
-          <tbody>
-              {% if movimientos %}
-              {% for movimiento in movimientos %}
-              <tr>
-                  <td>{{ movimiento.nombre }}</td>
-                  <td>{{ movimiento.talla }}</td>
-                  <td>{{ movimiento.categoria }}</td>
-                  <td>${{ movimiento.precio }}</td>
-                  <td>{{ movimiento.stock }}</td>
-                  <td>{{ movimiento.accion }}</td>
-                  <td>{{ movimiento.fecha|date:"d-m-Y H:i" }}</td>
-              </tr>
-              {% endfor %}
-              {% else %}
-              <tr>
-                  <td colspan="8" class="text-center">No hay movimientos registrados</td>
-              </tr>
-              {% endif %}
-          </tbody>
-      </table>
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-center text-md-start mb-4">
+    <h1 class="mb-3 mb-md-0 text-primary">Gestión de Reportes</h1>
+    <div class="d-flex flex-column flex-sm-row gap-2">
+      <button id="exportPdfBtn" class="btn btn-danger btn-lg"><i class="fas fa-file-pdf me-2"></i>Exportar PDF</button>
+      <button id="exportExcelBtn" class="btn btn-success btn-lg"><i class="fas fa-file-excel me-2"></i>Exportar Excel</button>
     </div>
   </div>
-  <footer class="text-center py-3">
-    <small>Copyright © 2024 AmiStore.</small>
-  </footer>
+  
+  {# messageContainer se hereda de base.html #}
 
-  <!-- JS de BS5 -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
-  <!-- JS DATATABLE -->
-  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <form method="get" class="mb-4 p-3 border rounded shadow-sm bg-light">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label for="startDateFilter" class="form-label fw-bold">Fecha de inicio</label>
+            <input type="date" id="startDateFilter" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+        </div>
+        <div class="col-md-3">
+            <label for="endDateFilter" class="form-label fw-bold">Fecha de fin</label>
+            <input type="date" id="endDateFilter" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+        </div>
+        <div class="col-md-3">
+            <label for="actionTypeFilter" class="form-label fw-bold">Tipo de Acción</label>
+            <select id="actionTypeFilter" name="action_type" class="form-select">
+                <option value="" {% if not request.GET.action_type %}selected{% endif %}>Todos</option>
+                <option value="Agregar (Jefe)" {% if request.GET.action_type == "Agregar (Jefe)" %}selected{% endif %}>Agregar Producto</option>
+                <option value="Modificación (Jefe)" {% if request.GET.action_type == "Modificación (Jefe)" %}selected{% endif %}>Modificación Producto</option>
+                <option value="Ajuste (Empleado)" {% if request.GET.action_type == "Ajuste (Empleado)" %}selected{% endif %}>Ajuste de Stock</option>
+                <option value="Eliminación (Jefe)" {% if request.GET.action_type == "Eliminación (Jefe)" %}selected{% endif %}>Eliminación Producto</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-primary w-100"><i class="fas fa-filter me-2"></i>Aplicar</button>
+          <a href="{% url 'reports' %}" class="btn btn-outline-secondary w-100"><i class="fas fa-redo me-2"></i>Limpiar filtros</a>
+        </div>
+    </div>
+  </form>
+
+  <div class="table-responsive mt-4">
+    <table id="dataTable" class="table table-striped table-bordered w-100 shadow-sm rounded-3 overflow-hidden">
+        <thead class="table-primary">
+            <tr>
+                <th>Producto ID</th>
+                <th>Nombre</th>
+                <th>Talla</th>
+                <th>Categoría</th>
+                <th>Precio Ant.</th>
+                <th>Stock Ant.</th>
+                <th>Precio Nue.</th>
+                <th>Stock Nue.</th>
+                <th>Acción</th>
+                <th>Cantidad Ajustada</th>
+                <th>Usuario</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movimiento in movimientos %}
+            <tr>
+                <td>{{ movimiento.producto_id|default:"N/A" }}</td>
+                <td>{{ movimiento.nombre_producto|default:"N/A" }}</td>
+                <td>{{ movimiento.talla|default:"N/A" }}</td>
+                <td>{{ movimiento.categoria|default:"N/A" }}</td>
+                <td>${{ movimiento.precio_anterior|floatformat:2|default:"0.00" }}</td>
+                <td>{{ movimiento.stock_anterior|default:"0" }}</td>
+                <td>${{ movimiento.precio_nuevo|floatformat:2|default:"0.00" }}</td>
+                <td>{{ movimiento.stock_nuevo|default:"0" }}</td>
+                <td>{{ movimiento.accion }}</td>
+                <td class="text-center">{{ movimiento.cantidad_ajustada|default:"-" }}</td>
+                <td>{{ movimiento.usuario.email|default:movimiento.usuario_nombre|default:"Sistema" }}</td>
+                <td>{{ movimiento.fecha|date:"d-m-Y H:i" }}</td>
+            </tr>
+            {% empty %}
+            {# DataTables manejará el mensaje #}
+            {% endfor %}
+        </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  {# jQuery y showMessage se heredan de base.html #}
   <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
   <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
   <script>
     $(document).ready(function () {
-      $("#example").DataTable({
+      $("#dataTable").DataTable({
         language: {
-          url: "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json",
+          url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-MX.json",
+          emptyTable: "No hay movimientos registrados para los filtros seleccionados."
         },
         pageLength: 10,
-        lengthMenu: [5, 10, 25, 50],
+        lengthMenu: [10, 25, 50, 100],
+        order: [[11, "desc"]], // Ordenar por fecha descendente por defecto
+        responsive: true,
+        // Deshabilitar la búsqueda y ordenación de DataTables si los filtros del form se encargan de ello
+        // O dejarla para filtrar sobre los resultados ya filtrados por el backend
+        // searching: false, 
+        // ordering: false, 
+      });
+
+      // Exportar a PDF
+      $('#exportPdfBtn').on('click', function () {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('landscape'); // Orientación horizontal para más columnas
+        const logoImg = document.querySelector("header img[src*='logoRapifresh.avif']"); // Selector actualizado
+        doc.setFontSize(18);
+        doc.text("Reporte de Movimientos - Rapifresh", doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
+        let startYPosition = 25;
+
+        if (logoImg) {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.src = logoImg.src;
+            img.onload = function() {
+                try {
+                    const imgProps = doc.getImageProperties(img);
+                    const pdfWidth = 15; // Más pequeño en landscape
+                    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                    const x = (doc.internal.pageSize.getWidth() - pdfWidth) / 2; // Centrar logo
+                    doc.addImage(img, 'AVIF', x, 8, pdfWidth, pdfHeight); // Formato AVIF
+                    startYPosition = pdfHeight + 15;
+                } catch (e) { console.error("Error al añadir imagen al PDF:", e); }
+                doc.autoTable({ html: '#dataTable', startY: startYPosition, theme: 'grid', headStyles: { fillColor: [22, 162, 185] }, styles: { fontSize: 7, cellPadding: 1 } });
+                doc.save('reporte-movimientos.pdf');
+                showMessage('info', 'Reporte de Movimientos exportado a PDF.');
+            };
+            img.onerror = function() {
+                console.error("No se pudo cargar imagen del logo para PDF.");
+                doc.autoTable({ html: '#dataTable', startY: startYPosition, theme: 'grid', headStyles: { fillColor: [22, 162, 185] }, styles: { fontSize: 7 } });
+                doc.save('reporte-movimientos.pdf');
+                showMessage('warning', 'Reporte exportado a PDF (sin logo).');
+            };
+        } else {
+            console.warn("Logo no encontrado para PDF.");
+            doc.autoTable({ html: '#dataTable', startY: startYPosition, theme: 'grid', headStyles: { fillColor: [22, 162, 185] }, styles: { fontSize: 7 } });
+            doc.save('reporte-movimientos.pdf');
+            showMessage('info', 'Reporte exportado a PDF (logo no encontrado).');
+        }
+      });
+
+      // Exportar a Excel
+      $('#exportExcelBtn').on('click', function () {
+        const table = document.getElementById('dataTable');
+        const wb = XLSX.utils.table_to_book(table, { sheet: "Movimientos" });
+        XLSX.writeFile(wb, "reporte-movimientos.xlsx");
+        showMessage('info', 'Reporte de Movimientos exportado a Excel.');
       });
     });
   </script>
-
-<!-- Incluye jsPDF y jsPDF-Autotable -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
-<script>
-  document.getElementById("exportPdf").addEventListener("click", () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    // Logo
-    const logo = document.querySelector("img[src*='logo.jpg']").src;
-    const img = new Image();
-    img.src = logo;
-
-    img.onload = function () {
-      const imgProps = doc.getImageProperties(img);
-      const pdfWidth = 50;
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      doc.addImage(img, "JPEG", 10, 10, pdfWidth, pdfHeight);
-
-      // Título
-      doc.setFontSize(16);
-      doc.text("Reportes Diarios - AmiStore", 70, 20);
-
-      // Tabla
-      const table = document.querySelector("#example");
-      doc.autoTable({
-        html: table,
-        startY: pdfHeight + 20,
-        theme: "grid",
-        styles: { fontSize: 10 },
-      });
-
-      // Guardar PDF
-      doc.save("reportes-diarios.pdf");
-    };
-  });
-</script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script>
-  document.getElementById("exportExcel").addEventListener("click", () => {
-    const table = document.querySelector("#example");
-    const rows = Array.from(table.querySelectorAll("tr")).map((row) =>
-      Array.from(row.querySelectorAll("th, td")).map((cell) => cell.innerText)
-    );
-
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(rows);
-
-    XLSX.utils.book_append_sheet(wb, ws, "Reportes Diarios");
-
-    // Guardar Excel
-    XLSX.writeFile(wb, "reportes-diarios.xlsx");
-  });
-</script>
-
-
-</body>
-
-</html>
+{% endblock %}

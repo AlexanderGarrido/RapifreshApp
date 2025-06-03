@@ -1,218 +1,255 @@
-from django.shortcuts import render, redirect
-from .forms import LoginForm, productosForm
-from .models import Usuarios  
-from django.contrib.auth.hashers import check_password 
+# views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import LoginForm, ProductosForm, UsuarioCreationForm # Importar ProductosForm y el nuevo UsuarioCreationForm
+from .models import Usuarios, Productos, Movimiento
+# Importaciones para autenticación de Django
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from .models import Productos, Movimiento
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from datetime import datetime
 from django.db.models import Q
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
 import json
 
+# --- Decoradores personalizados para roles ---
 
-#login de inicio de sesion
+def is_Administrador(user):
+    """Verifica si el usuario es 'Administrador'."""
+    # Asegúrate de que 'Administrador' coincida con el valor en ROL_CHOICES de models.py
+    return user.is_authenticated and user.rol == 'Administrador'
+
+def is_empleado(user):
+    """Verifica si el usuario es 'Empleado'."""
+    # Asegúrate de que 'Empleado' coincida con el valor en ROL_CHOICES de models.py
+    return user.is_authenticated and user.rol == 'Empleado'
+
+def Administrador_required(view_func):
+    """Decorador que requiere que el usuario sea 'Administrador'."""
+    decorated_view_func = login_required(user_passes_test(is_Administrador, login_url='login', redirect_field_name=None)(view_func))
+    return decorated_view_func
+
+def Empleado_required(view_func):
+    """Decorador que requiere que el usuario sea 'Empleado'."""
+    decorated_view_func = login_required(user_passes_test(is_empleado, login_url='login', redirect_field_name=None)(view_func))
+    return decorated_view_func
+
+# --- Vistas ---
+
+# Login de inicio de sesion
 def login_view(request):
+    if request.user.is_authenticated:
+        # Si el usuario ya está autenticado, redirigir según su rol
+        if request.user.rol == 'Administrador':
+            return redirect('inicio')
+        elif request.user.rol == 'Empleado': # Cambiado a 'Empleado'
+            return redirect('inicioEmp')
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
 
-            try:
-                # Intenta obtener al usuario por el correo electrónico
-                user = Usuarios.objects.get(email=email)
+            # Autenticar al usuario usando el backend de autenticación de Django
+            user = authenticate(request, username=email, password=password)
 
-                # Verifica si la contraseña proporcionada es correcta
-                if check_password(password, user.password):
-                    #redirigimos al usuario dependiendo de su rol
-                    if user.rol == 'Jefa':
-                        return redirect('inicio')
-                    elif user.rol == 'empleado':
-                        return redirect('inicioEmp')
-                    # Si la autenticación es correcta, redirige a la página de inventario
-                    else:
-                        return redirect('inicio')
+            if user is not None:
+                # Iniciar sesión al usuario
+                login(request, user)
+                messages.success(request, f'Bienvenido, {user.nombre}!')
+                # Redirigir según el rol del usuario
+                if user.rol == 'Administrador':
+                    return redirect('inicio')
+                elif user.rol == 'Empleado': # Cambiado a 'Empleado'
+                    return redirect('inicioEmp')
                 else:
-                    # Si la contraseña es incorrecta, muestra un mensaje de error
-                    messages.error(request, 'Contraseña incorrecta. Inténtalo de nuevo.')
+                    # Rol desconocido, redirigir a una página por defecto o mostrar error
+                    messages.error(request, 'Rol de usuario no reconocido.')
+                    return redirect('login')
+            else:
+                # Si la autenticación falla, muestra un mensaje de error
+                messages.error(request, 'Correo electrónico o contraseña incorrectos.')
+        else:
+            # Si el formulario no es válido, los errores se mostrarán en la plantilla
+            pass # Los errores del formulario se manejan en la plantilla
 
-            except Usuarios.DoesNotExist:
-                # Si el usuario no existe, muestra un mensaje de error
-                messages.error(request, 'Correo electrónico no registrado.')
-
-        # Si el formulario no es válido, muestra los errores
-        return render(request, 'inventarioApp/login.html', {'form': form})
-
-    else:
+    else: # GET request
         form = LoginForm()
 
-    # Renderiza el formulario vacío en la solicitud GET
     return render(request, 'inventarioApp/login.html', {'form': form})
 
+# Logout de sesion
+@login_required # Asegura que solo usuarios logueados puedan cerrar sesión
+def logout_view(request):
+    logout(request)
+    messages.info(request, 'Has cerrado sesión exitosamente.')
+    return redirect('login')
 
+
+@Administrador_required # Solo accesible por 'Administrador'
 def inventario_view(request):
+    """Vista para el panel de inicio del rol 'Administrador'."""
     return render(request, 'inventarioApp/inicio.html')
 
+@Empleado_required # Solo accesible por 'Empleado'
 def inventario_viewEmp(request):
+    """Vista para el panel de inicio del rol 'Empleado'."""
     return render(request, 'inventarioApp/inicioEmp.html')
 
-def reports(request):
-    return render(request, 'inventarioApp/reports.html')
-
-# Inventario vista de administradores
+@Administrador_required # Solo accesible por 'Administrador'
 def inventario(request):
-    # Obtener la categoría seleccionada desde la URL
-    categoria_seleccionada = request.GET.get('categoria')
+    """
+    Vista para la gestión de inventario por parte de administradores (Administrador).
+    Permite ver, agregar, modificar y eliminar productos, con opciones de filtro.
+    """
+    productos = Productos.objects.all() # Obtener todos los productos
 
-    # Filtrar productos (puedes agregar lógica real si es necesario)
-    productos = Productos.objects.all()
+    # Obtener parámetros de filtro de la URL
+    nombre_filter = request.GET.get('nombre')
+    categoria_filter = request.GET.get('categoria')
+    stock_min_filter = request.GET.get('stock_min')
 
-    # Actualización de stock
-    if request.method == 'POST':
-        producto_id = int(request.POST.get('producto_id'))
-        nuevo_stock = int(request.POST.get('nuevo_stock'))
-
-        producto = Productos.objects.get(id=producto_id)
-        producto.stock = nuevo_stock
-        producto.save()
-
-        # Registrar el movimiento
-        Movimiento.objects.create(
-            nombre=producto.nombre,
-            descripcion=producto.descripcion,
-            categoria=producto.categoria,
-            talla=producto.talla,
-            precio=producto.precio,
-            stock=nuevo_stock,
-            accion="Ajuste de Stock (Jefe)"
-        )
-
-        return redirect('inventario')
+    # Aplicar filtros si están presentes
+    if nombre_filter:
+        productos = productos.filter(nombre__icontains=nombre_filter)
+    if categoria_filter:
+        productos = productos.filter(categoria__icontains=categoria_filter)
+    if stock_min_filter:
+        try:
+            stock_min_filter = int(stock_min_filter)
+            productos = productos.filter(stock__gte=stock_min_filter)
+        except ValueError:
+            # Puedes añadir un mensaje de error si el stock_min no es un número válido
+            messages.error(request, 'El valor de "Stock Mínimo" debe ser un número entero.')
+            pass # Continúa sin aplicar este filtro si hay un error de valor
 
     # Datos que pasamos al template
     data = {
         'seccion': 'inventario',
         'productos': productos,
-        'categoria_seleccionada': categoria_seleccionada,
+        'request_get': request.GET # Pasa request.GET para mantener los valores de los filtros en la plantilla
     }
-
     return render(request, 'inventarioApp/inventario.html', data)
 
-# Inventario vista de empleados
+@Empleado_required # Solo accesible por 'Empleado'
 def inventarioEmp(request):
-    # Obtener la categoría seleccionada desde la URL (GET request)
-    categoria_seleccionada = request.GET.get('categoria')
-
-    # Filtrar productos por categoría
-    productos = []
-    if categoria_seleccionada == 'Pantalones':
-        productos = Productos.objects.all()
-    elif categoria_seleccionada == 'Poleras':
-        productos = Productos.objects.all()
-    elif categoria_seleccionada == 'Zapatos':
-        productos = Productos.objects.all()
-    else:
-        productos = list(Productos.objects.all())
-
-    # Si se ha enviado un cambio de stock
-    if request.method == 'POST':
-        # Obtener el ID del producto y el nuevo stock desde el formulario
-        producto_id = int(request.POST.get('producto_id'))
-        nuevo_stock = int(request.POST.get('nuevo_stock'))
-
-        # Obtener el producto y actualizar el stock
-        producto = Productos.objects.get(id=producto_id)
-        producto.stock = nuevo_stock
-        producto.save()
-
-        # Registrar el movimiento de "actualización de stock" en la tabla Movimiento
-        Movimiento.objects.create(
-            nombre=producto.nombre,
-            descripcion=producto.descripcion,
-            categoria=producto.categoria,
-            talla=producto.talla,
-            precio=producto.precio,
-            stock=nuevo_stock,
-            accion="Ajuste Stock (Empleado)"  # Tipo de acción	
-        )
-
-        # Redireccionar para evitar que se vuelva a enviar el formulario al refrescar la página
-        return redirect('inventarioApp/inventarioEmp.html')
+    """
+    Vista para la gestión de inventario por parte de empleados.
+    Permite ver y ajustar el stock de productos.
+    """
+    productos = Productos.objects.all() # Los empleados ven todos los productos
 
     # Datos que pasamos al template
     data = {
         'seccion': 'inventario',
         'productos': productos,
-        'categoria_seleccionada': categoria_seleccionada,
     }
-
     return render(request, 'inventarioApp/inventarioEmp.html', data)
 
-
+@Administrador_required # Solo accesible por 'Administrador'
 def usuario(request):
+    """Vista para la gestión de usuarios."""
     usuarios = Usuarios.objects.all()
     return render(request, 'inventarioApp/usuarios.html', {'Usuarios': usuarios})
 
-#agregar producto
-def agregarProducto(request):
-    form = productosForm()
+@Administrador_required # Solo accesible por 'Administrador'
+def agregarUsuario(request):
+    """
+    Vista para agregar un nuevo usuario (Administrador o Empleado).
+    Solo accesible por 'Administrador'.
+    """
     if request.method == 'POST':
-        form = productosForm(request.POST)
+        form = UsuarioCreationForm(request.POST)
         if form.is_valid():
-            # Crear el nuevo producto
-            nuevo_producto = Productos.objects.create(
-                nombre=form.cleaned_data['nombre'],
-                descripcion=form.cleaned_data['descripcion'],
-                talla=form.cleaned_data['talla'],
-                categoria=form.cleaned_data['categoria'],
-                precio=form.cleaned_data['precio'],
-                stock=form.cleaned_data['stock']
-            )
+            user = form.save()
+            messages.success(request, f'Usuario {user.email} creado exitosamente como {user.rol}.')
+            return redirect('usuarios') # Redirigir a la lista de usuarios
+        else:
+            messages.error(request, 'Hubo un error al crear el usuario. Por favor, revisa los campos.')
+    else:
+        form = UsuarioCreationForm()
+    return render(request, 'inventarioApp/agregarUsuario.html', {'form': form})
+
+
+@Administrador_required # Solo accesible por 'Administrador'
+def agregarProducto(request):
+    """
+    Vista para agregar un nuevo producto al inventario.
+    Registra el movimiento en la tabla Movimiento.
+    """
+    form = ProductosForm() # Usar el ModelForm
+    if request.method == 'POST':
+        form = ProductosForm(request.POST) # Usar el ModelForm
+        if form.is_valid():
+            # Guardar el nuevo producto directamente desde el formulario
+            nuevo_producto = form.save()
 
             # Registrar el movimiento de "agregar" en la tabla Movimiento
             Movimiento.objects.create(
-                nombre=nuevo_producto.nombre,
+                producto_id=nuevo_producto.id, # Guarda el ID del producto
+                nombre_producto=nuevo_producto.nombre, # Nombre del producto
+                descripcion=nuevo_producto.descripcion, # Asegurarse de pasar la descripción
                 categoria=nuevo_producto.categoria,
                 talla=nuevo_producto.talla,
-                precio=nuevo_producto.precio,
-                stock=nuevo_producto.stock,
-                accion="Agregar (Jefe)"  # Tipo de acción
+                precio_anterior=0.00, # Precio anterior al agregar (0)
+                stock_anterior=0, # Stock anterior al agregar (0)
+                precio_nuevo=nuevo_producto.precio,
+                stock_nuevo=nuevo_producto.stock,
+                accion="Agregar (Administrador)",  # Tipo de acción
+                cantidad_ajustada=nuevo_producto.stock, # Cantidad total agregada
+                usuario=request.user if request.user.is_authenticated else None, # Registrar el usuario
+                usuario_nombre=request.user.get_full_name() if request.user.is_authenticated else "Administrador", #
             )
 
+            messages.success(request, 'Producto agregado exitosamente.')
             return HttpResponseRedirect(reverse('inventario'))
+        else:
+            messages.error(request, 'Hubo un error al agregar el producto. Por favor, revisa los campos.')
+    
     data = {'form': form}
     return render(request, 'inventarioApp/agregarProducto.html', data)
 
-# Reportes de inventario
+@Administrador_required # Solo accesible por 'Administrador'
 def reports(request):
+    """
+    Vista para generar reportes de movimientos de inventario.
+    Permite filtrar por rango de fechas y tipo de acción.
+    """
     movimientos = Movimiento.objects.all()
     
     # Obtener filtros desde los parámetros GET
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+    start_date_str = request.GET.get('start_date')
+    end_date_str = request.GET.get('end_date')
     action_type = request.GET.get('action_type')
 
     # Filtrar movimientos en base a los filtros proporcionados
-    if start_date:
-        movimientos = movimientos.filter(fecha__gte=datetime.strptime(start_date, '%Y-%m-%d'))
-    if end_date:
-        movimientos = movimientos.filter(fecha__lte=datetime.strptime(end_date, '%Y-%m-%d'))
+    if start_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            movimientos = movimientos.filter(fecha__gte=start_date)
+        except ValueError:
+            messages.error(request, 'Formato de fecha de inicio inválido.')
+    if end_date_str:
+        try:
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+            # Para incluir el día completo, se ajusta a las 23:59:59
+            movimientos = movimientos.filter(fecha__lte=end_date.replace(hour=23, minute=59, second=59))
+        except ValueError:
+            messages.error(request, 'Formato de fecha de fin inválido.')
     if action_type:
         movimientos = movimientos.filter(accion=action_type)
 
     return render(request, 'inventarioApp/reports.html', {'movimientos': movimientos})
 
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from .models import Productos, Movimiento
-
+@Empleado_required # Solo accesible por 'Empleado'
 def ajustarStock(request, producto_id):
+    """
+    Vista AJAX para ajustar el stock de un producto.
+    Registra el movimiento en la tabla Movimiento.
+    """
     if request.method == "POST":
         try:
-            # Leer y validar datos
             data = json.loads(request.body)
             adjustment = int(data.get("adjustment", 0))
             
@@ -220,6 +257,7 @@ def ajustarStock(request, producto_id):
                 return JsonResponse({"status": "error", "message": "El ajuste no puede ser cero."}, status=400)
 
             producto = get_object_or_404(Productos, id=producto_id)
+            stock_anterior = producto.stock # Guardar el stock anterior para el registro
             new_stock = producto.stock + adjustment
 
             if new_stock < 0:
@@ -229,82 +267,141 @@ def ajustarStock(request, producto_id):
             producto.stock = new_stock
             producto.save()
 
+            # Determinar el tipo de acción para el registro
+            accion_movimiento = "Ajuste (Empleado)"
+            
             # Registrar el movimiento
             Movimiento.objects.create(
-                nombre=producto.nombre,
+                producto_id=producto.id, # Guarda el ID del producto
+                nombre_producto=producto.nombre, # Nombre del producto
+                descripcion=producto.descripcion, # Asegurarse de pasar la descripción
                 categoria=producto.categoria,
                 talla=producto.talla,
-                precio=producto.precio,
-                stock=producto.stock,
-                accion="Ajuste"
+                precio_anterior=producto.precio, # Precio antes del ajuste (asumiendo que no cambia)
+                stock_anterior=stock_anterior, # Stock antes del ajuste
+                precio_nuevo=producto.precio, # Precio después del ajuste
+                stock_nuevo=producto.stock, # Stock final después del ajuste
+                accion=accion_movimiento,
+                cantidad_ajustada=adjustment, # Cantidad ajustada (puede ser positiva o negativa)
+                usuario=request.user if request.user.is_authenticated else None, # Registrar el usuario
+                usuario_nombre=request.user.get_full_name() if request.user.is_authenticated else "Empleado",
             )
 
-            return JsonResponse({"status": "success", "stock": producto.stock})
+            return JsonResponse({"status": "success", "stock": producto.stock, "message": "Stock ajustado correctamente."})
 
         except ValueError:
-            return JsonResponse({"status": "error", "message": "Datos inválidos."}, status=400)
+            return JsonResponse({"status": "error", "message": "Datos de ajuste inválidos. Asegúrate de que el ajuste sea un número entero."}, status=400)
         except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+            print(f"Error al ajustar el producto: {e}")
+            return JsonResponse({"status": "error", "message": f"Error interno del servidor: {str(e)}"}, status=500)
 
     return JsonResponse({"status": "error", "message": "Método no permitido."}, status=405)
 
 
-# Modificar un producto
+@Administrador_required # Solo accesible por 'Administrador'
 def modificarProducto(request, producto_id):
+    """
+    Vista AJAX para modificar los detalles de un producto.
+    Registra el movimiento en la tabla Movimiento.
+    """
     if request.method == 'POST':
         try:
-            # Obtener el producto por ID usando el modelo correcto
+            # Obtener el producto por ID
             producto = get_object_or_404(Productos, id=producto_id)
+
+            # Guardar los valores anteriores para el registro de movimiento
+            nombre_anterior = producto.nombre
+            descripcion_anterior = producto.descripcion
+            categoria_anterior = producto.categoria
+            talla_anterior = producto.talla
+            precio_anterior = producto.precio
+            stock_anterior = producto.stock
 
             # Capturar los datos enviados en la solicitud
             nombre = request.POST.get('nombre')
             descripcion = request.POST.get('descripcion')
             categoria = request.POST.get('categoria')
             talla = request.POST.get('talla')
-            precio = request.POST.get('precio')
-            stock = request.POST.get('stock')
+            precio_str = request.POST.get('precio') # Obtener como string
+            stock_str = request.POST.get('stock')   # Obtener como string
             
-            # Validar que los datos no están vacíos
-            producto.nombre = nombre or producto.nombre
-            producto.descripcion = descripcion or producto.descripcion
-            producto.categoria = categoria or producto.categoria
-            producto.talla = talla or producto.talla
-            producto.precio = float(precio) if precio else producto.precio
-            producto.stock = int(stock) if stock else producto.stock
+            # Validar y convertir precio
+            precio_nuevo = producto.precio
+            if precio_str:
+                try:
+                    precio_nuevo = float(precio_str)
+                except ValueError:
+                    return JsonResponse({'success': False, 'error': 'Precio inválido. Debe ser un número.'}, status=400)
+
+            # Validar y convertir stock
+            stock_nuevo = producto.stock
+            if stock_str:
+                try:
+                    stock_nuevo = int(stock_str)
+                except ValueError:
+                    return JsonResponse({'success': False, 'error': 'Stock inválido. Debe ser un número entero.'}, status=400)
+
+            # Actualizar los campos del producto si se proporcionan y son válidos
+            producto.nombre = nombre if nombre else producto.nombre
+            producto.descripcion = descripcion if descripcion else producto.descripcion
+            producto.categoria = categoria if categoria else producto.categoria
+            producto.talla = talla if talla else producto.talla
+            producto.precio = precio_nuevo
+            producto.stock = stock_nuevo
 
             # Guardar cambios en la base de datos
             producto.save()
 
             # Registrar el movimiento de "modificación" en la tabla Movimiento
             Movimiento.objects.create(
-                nombre=producto.nombre,
-                categoria=producto.categoria,
-                talla=producto.talla,
-                precio=producto.precio,
-                stock=producto.stock,
-                accion="Modificación (Jefe)"  # Tipo de acción
+                producto_id=producto.id, # Guarda el ID del producto
+                nombre_producto=nombre_anterior, # Nombre anterior del producto
+                descripcion=descripcion_anterior, # Descripción anterior
+                categoria=categoria_anterior, # Categoría anterior
+                talla=talla_anterior, # Talla anterior
+                precio_anterior=precio_anterior,
+                stock_anterior=stock_anterior,
+                precio_nuevo=producto.precio, # Precio nuevo
+                stock_nuevo=producto.stock, # Stock nuevo
+                accion="Modificación (Administrador)",  # Tipo de acción
+                usuario=request.user if request.user.is_authenticated else None, # Registrar el usuario
+                usuario_nombre=request.user.get_full_name() if request.user.is_authenticated else "Administrador", #
             )
 
-            return JsonResponse({'success': True})
+            return JsonResponse({'success': True, 'message': 'Producto modificado correctamente.'})
         except Exception as e:
             print(f"Error al actualizar el producto: {e}")
-            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+            return JsonResponse({'success': False, 'error': str(e), 'message': 'Error al actualizar el producto.'}, status=500)
     else:
         return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
 
 
+@Administrador_required # Solo accesible por 'Administrador'
 def eliminarProducto(request, producto_id):
-    producto = Productos.objects.get(id=producto_id)
-    producto.delete()
-
-    # Registrar el movimiento de "eliminación" en la tabla Movimiento
+    """
+    Vista para eliminar un producto del inventario.
+    Registra el movimiento en la tabla Movimiento.
+    """
+    producto = get_object_or_404(Productos, id=producto_id)
+    
+    # Registrar el movimiento de "eliminación" antes de eliminar el producto
     Movimiento.objects.create(
-        nombre=producto.nombre,
+        producto_id=producto.id, # Guarda el ID del producto
+        nombre_producto=producto.nombre, # Nombre del producto eliminado
+        descripcion=producto.descripcion, # Asegurarse de pasar la descripción
         talla=producto.talla,
         categoria=producto.categoria,
-        precio=producto.precio,
-        stock=producto.stock,
-        accion="Eliminación (Jefe)"  # Tipo de acción
+        precio_anterior=producto.precio, # Precio que tenía antes de ser eliminado
+        stock_anterior=producto.stock, # El stock que tenía antes de ser eliminado
+        precio_nuevo=0.00, # Precio después de la eliminación (0)
+        stock_nuevo=0, # Stock después de la eliminación (0)
+        accion="Eliminación (Administrador)",  # Tipo de acción
+        cantidad_ajustada=-producto.stock, # Cantidad ajustada (total eliminado)
+        usuario=request.user if request.user.is_authenticated else None, # Registrar el usuario
+        usuario_nombre=request.user.get_full_name() if request.user.is_authenticated else "Administrador",
     )
-    return HttpResponseRedirect(reverse('inventario'))
     
+    producto.delete()
+    messages.success(request, 'Producto eliminado exitosamente.')
+    return HttpResponseRedirect(reverse('inventario'))
+

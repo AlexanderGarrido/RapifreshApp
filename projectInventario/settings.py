@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os # Importar el módulo os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,8 +25,11 @@ TEMPLATES_DIR = BASE_DIR / 'templates'
 SECRET_KEY = 'django-insecure-4orof7usregyo51sx9+mr@t#h4oki_+8qq-9v1_yc(vxkrikz+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True # CAMBIAR A False EN PRODUCCIÓN
 
+# ALLOWED_HOSTS = [] # En desarrollo, puede estar vacío o ['127.0.0.1', 'localhost']
+# En producción, debe contener los nombres de dominio y/o IPs de tu servidor, ejemplo:
+# ALLOWED_HOSTS = ['tudominio.com', 'www.tudominio.com', 'tu_ip_servidor']
 ALLOWED_HOSTS = []
 
 
@@ -38,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'inventarioApp',
+    'inventarioApp', # Tu aplicación personalizada
 ]
 
 MIDDLEWARE = [
@@ -64,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.static', # ¡Añadido para que {% static %} funcione!
             ],
         },
     },
@@ -83,8 +88,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'inventarioropa',
         'USER': 'root',
-        'PASSWORD': 'Admin123.',
-        'HOST': 'inventarioropa.cv0oy8i8mej5.us-east-1.rds.amazonaws.com',
+        'PASSWORD': '', # ¡CAMBIAR EN PRODUCCIÓN!
+        'HOST': '127.0.0.1',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -116,9 +121,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = 'es-cl' # Cambiado a español de Chile
+TIME_ZONE = 'America/Santiago' # Cambiado a la zona horaria de Santiago
 
 USE_I18N = True
 
@@ -127,14 +131,44 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-import os
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+# STATIC_ROOT es donde Django recolectará todos los archivos estáticos para producción.
+# Descomentar para producción y correr 'python manage.py collectstatic'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Media files (user uploaded files)
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Configuración para usar tu modelo de usuario personalizado
+AUTH_USER_MODEL = 'inventarioApp.Usuarios'
+
+# URL a la que se redirige después de iniciar sesión
+LOGIN_REDIRECT_URL = '/' # Se manejará en la vista de login según el rol
+LOGOUT_REDIRECT_URL = 'login' # Redirige a la página de login después de cerrar sesión
+
+# URL a la que se redirige si el usuario no está logueado
+LOGIN_URL = 'login'
+
+# Configuración de Seguridad Adicional (Recomendado para Producción)
+# Estas configuraciones deben ser True en producción para mejorar la seguridad
+# CSRF_COOKIE_SECURE = False # Cambiar a True en producción
+# SESSION_COOKIE_SECURE = False # Cambiar a True en producción
+# SECURE_BROWSER_XSS_FILTER = True # Protege contra ataques XSS
+# SECURE_CONTENT_TYPE_NOSNIFF = True # Previene ataques de "MIME sniffing"
+# X_FRAME_OPTIONS = 'DENY' # Previene ataques de "clickjacking"
+
+# Configuración de Email (si tu aplicación envía correos)
+# DEFAULT_FROM_EMAIL = 'webmaster@tudominio.com' # Correo por defecto para emails salientes
+# SERVER_EMAIL = 'errores@tudominio.com' # Correo para errores del servidor
+

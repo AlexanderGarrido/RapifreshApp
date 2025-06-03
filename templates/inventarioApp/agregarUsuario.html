@@ -1,0 +1,41 @@
+{% extends 'inventarioApp/base.html' %}
+{% load static %}
+
+{% block title %}Agregar Usuario - Rapifresh{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0 text-primary">Agregar Nuevo Usuario</h1>
+        <a href="{% url 'usuarios' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver a Usuarios
+        </a>
+    </div>
+
+    {# messageContainer se hereda de base.html #}
+
+    <div class="card shadow-sm rounded-3">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary btn-lg mt-3">
+                    <i class="fas fa-user-plus me-2"></i>Crear Usuario
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,44 @@
+/* Custom CSS para Rapifresh */
+
+/* Logo principal de la marca (Rapifresh) en la cabecera */
+.main-brand-logo {
+    height: 50px; /* Ajustar altura según sea necesario */
+    object-fit: contain; /* Asegura que el logo completo sea visible sin recortar */
+    border-radius: 50%; /* Si el logo es cuadrado, lo hace circular */
+    border: 2px solid #fff; /* Borde blanco para el logo */
+}
+
+/* Logo de tu empresa en el pie de página */
+.footer-company-logo {
+    height: 20px; /* Ajustar altura, mantener sutil */
+    object-fit: contain;
+    vertical-align: middle; /* Alinear con el texto */
+    margin-left: 8px; /* Espacio del texto "Desarrollado por" */
+}
+
+/* Efecto hover general para las tarjetas */
+.hover-lift {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px); /* Eleva la tarjeta ligeramente */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; /* Sombra más fuerte al pasar el ratón */
+}
+
+/* Asegurar que los controles de formulario dentro de los bucles hereden los estilos de Bootstrap */
+.form-control {
+    width: 100%; /* Asegura que los inputs tomen todo el ancho de su padre */
+}
+
+/* Estilos específicos para alertas si es necesario (el predeterminado de Bootstrap suele ser bueno) */
+.alert {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Ajustes para imágenes en tarjetas si es necesario */
+.card-img-top {
+  object-fit: contain; /* Asegura que la imagen se ajuste dentro del contenedor */
+  max-width: 100%; /* Asegura que no se desborde */
+}

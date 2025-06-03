@@ -1,292 +1,227 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'inventarioApp/base.html' %}
+{% load static %}
 
-<head>
-  {% load static %}
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mi Tienda 😁</title>
-  <!-- CSS de BS5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
-  <!-- CSS DATATABLE -->
+{% block title %}Gestión de Inventario (Empleado) - Rapifresh{% endblock %}
+
+{% block nav_links %}
+{# Este bloque puede ser eliminado si base.html ya maneja completamente los enlaces específicos del empleado #}
+<li class="nav-item">
+  <a href="{% url 'inicioEmp' %}" class="nav-link {% if request.resolver_match.url_name == 'inicioEmp' %}active{% endif %}">
+    Inicio Empleado
+  </a>
+</li>
+<li class="nav-item">
+  <a href="{% url 'inventarioEmp' %}" class="nav-link {% if request.resolver_match.url_name == 'inventarioEmp' %}active{% endif %}">
+    Inventario
+  </a>
+</li>
+{% endblock %}
+
+{% block extra_head %}
   <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-    }
+{% endblock %}
 
-    body {
-      display: flex;
-      flex-direction: column;
-      background-color: #ffe9cc;
-      color: #495057;
-    }
-
-    .navbar {
-      background-color: #343A40;
-      color: #FFFFFF;
-    }
-
-    .navbar .nav-link {
-      color: #FFFFFF;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .navbar .nav-link:hover {
-      background-color: #495057;
-      color: #ffe9cc;
-    }
-
-    .btn-primary {
-      background-color: #cfa266;
-      border-color: #b88d4d;
-    }
-
-    .btn-primary:hover {
-      background-color: #da9b3c;
-      border-color: #cfb22e;
-    }
-
-    .table thead {
-      background-color: #cfa266;
-      color: #FFFFFF;
-    }
-
-    .table tbody tr:nth-child(odd) {
-      background-color: #f8f9fa;
-    }
-
-    .table tbody tr:nth-child(even) {
-      background-color: #ffffff;
-    }
-
-    footer {
-      background-color: #343A40;
-      color: #FFFFFF;
-      border-top: 2px solid #FFC107;
-      text-align: center;
-      padding: 1rem;
-      margin-top: auto;
-    }
-
-    .nav-link.active {
-      font-weight: bold;
-      background-color: #495057;
-      color: #ffe9cc;
-      border-radius: 10px;
-    }
-  </style>
-</head>
-
-<body>
-  <!-- Barra superior -->
-  <header class="p-3 mb-3 border-bottom shadow-sm" style="background-color: #343A40;">
-    <div class="container">
-      <nav class="navbar navbar-expand-lg navbar-dark">
-        <!-- Logo -->
-        <a class="navbar-brand" href="{% url 'inicioEmp' %}">
-          <img src="{% static 'img/logo.jpg' %}" alt="Logo AmiStore" class="img-fluid" style="width: 80px; border-radius: 50%;">
-        </a>
-  
-        <!-- Toggle button for small screens -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        
-  
-        <!-- Collapsible content -->
-        <div class="collapse navbar-collapse" id="navbarContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0 text-center">
-            <li class="nav-item">
-              <a href="{% url 'inventarioEmp' %}" class="nav-link {% if request.path == '/inventarioEmp/' %}active{% endif %}">
-                Inventario
-              </a>
-            </li>
-          </ul>
-  
-          <!-- Logout -->
-          <div class="text-center mt-3 mt-lg-0">
-            <a class="nav-link px-2 link-light" href="{% url 'login' %}">
-              Cerrar sesión <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-            </a>
-          </div>
-        </div>
-      </nav>
-    </div>
-  </header>
-  
-  <!-- Contenedor Principal -->
-  <div class="container-fluid p-4">
-    <div class="d-flex justify-content-between align-items-center">
-      <h1 class="mb-0">Gestión de Inventario</h1>
-    </div>
-
-    <!-- Tabla estilo DataTables -->
-    <div class="table-responsive">
-      <table id="example" class="table table-striped table-bordered" style="width: 100%">
-        <thead>
-          <tr class="table-primary">
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Categoría</th>
-            <th>Talla</th>
-            <th>Precio</th>
-            <th>Stock</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-              <tr class="{% if producto.stock <= 3 %}table-danger{% elif producto.stock >= 4 and producto.stock <= 8 %}table-warning{% else %}table-light{% endif %}">
-                <th scope="row">{{ producto.id }}</th>
-                <td>{{ producto.nombre }}</td>
-                <td>{{ producto.descripcion }}</td>
-                <td>{{ producto.talla }}</td>
-                <td>{{ producto.categoria }}</td>
-                <td>${{ producto.precio }}</td>
-                <td>{{ producto.stock }}</td>
-                <td style="text-align: center">
-                  <button
-                    data-bs-toggle="modal"
-                    data-bs-target="#updateStock"
-                    class="add-button btn btn-primary"
-                    data-id="{{ producto.id }}"
-                    data-stock="{{ producto.stock }}"
-                  >
-                    <i class="fa-solid fa-pen"></i>
-                  </button>
-                </td>
-              </tr>
-            {% endfor %}
-        </tbody>
-        
-      </table>
-    </div>
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0 text-primary">Gestión de Inventario</h1>
+    {# No hay botones de exportación para empleados en esta versión #}
   </div>
 
-  <!--Modal de Ajustar Stock-->
-  <div class="modal fade" id="updateStock" tabindex="-1" aria-labelledby="updateStockModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Ajustar Stock</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="stockForm">
-            {% csrf_token %}
-            <input type="hidden" id="productId" />
-            <div class="mb-3">
-              <label for="productStock" class="form-label">Stock actual:</label>
-              <input type="number" class="form-control" id="productStock" readonly />
-            </div>
-            <div class="mb-3">
-              <label for="stockAdjustment" class="form-label">Ajuste de cantidad:</label>
-              <input type="number" class="form-control" id="stockAdjustment" required />
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" onclick="adjustStock('decrement')">Restar Stock</button>
-          <button type="button" class="btn btn-success" onclick="adjustStock('increment')">Sumar Stock</button>
-        </div>
+  {# messageContainer se hereda de base.html #}
+
+  <div class="table-responsive mt-4">
+    <table id="dataTable" class="table table-striped table-bordered w-100 shadow-sm rounded-3 overflow-hidden">
+      <thead class="table-primary">
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Categoría</th>
+          <th>Talla</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for producto in productos %}
+            <tr class="{% if producto.stock <= 3 %}table-danger{% elif producto.stock >= 4 and producto.stock <= 8 %}table-warning{% else %}table-light{% endif %}">
+              <td class="text-center">{{ producto.id }}</td>
+              <td>{{ producto.nombre }}</td>
+              <td>{{ producto.descripcion }}</td>
+              <td>{{ producto.categoria }}</td>
+              <td class="text-center">{{ producto.talla }}</td>
+              <td class="text-end">${{ producto.precio|floatformat:2 }}</td>
+              <td class="text-center">{{ producto.stock }}</td>
+              <td class="text-center">
+                <button
+                  data-bs-toggle="modal"
+                  data-bs-target="#updateStockModal"
+                  class="adjust-stock-button btn btn-sm btn-info" {# Cambiado a btn-info y btn-sm #}
+                  data-id="{{ producto.id }}"
+                  data-nombre="{{ producto.nombre }}"
+                  data-stock="{{ producto.stock }}"
+                  title="Ajustar Stock"
+                >
+                  <i class="fa-solid fa-edit me-1"></i> Ajustar
+                </button>
+              </td>
+            </tr>
+          {% empty %}
+            {# DataTables manejará el mensaje #}
+          {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal fade" id="updateStockModal" tabindex="-1" aria-labelledby="updateStockModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white"> {# Cambiado a bg-info #}
+        <h5 class="modal-title" id="updateStockModalLabel">Ajustar Stock de Producto</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="stockAdjustmentForm">
+          {% csrf_token %} {# Importante para la seguridad de la petición POST con fetch #}
+          <input type="hidden" id="adjProductId" name="product_id"> {# Nombre de campo consistente #}
+          <div class="mb-3">
+            <label for="adjProductName" class="form-label">Producto:</label>
+            <input type="text" class="form-control" id="adjProductName" readonly />
+          </div>
+          <div class="mb-3">
+            <label for="adjProductStock" class="form-label">Stock actual:</label>
+            <input type="number" class="form-control" id="adjProductStock" readonly />
+          </div>
+          <div class="mb-3">
+            <label for="adjStockAdjustment" class="form-label">Cantidad a ajustar (positiva):</label>
+            <input type="number" class="form-control" id="adjStockAdjustment" name="adjustment_quantity" min="1" required />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="decrementStockBtn"><i class="fas fa-minus-circle me-1"></i>Restar Stock</button>
+        <button type="button" class="btn btn-success" id="incrementStockBtn"><i class="fas fa-plus-circle me-1"></i>Sumar Stock</button>
       </div>
     </div>
   </div>
+</div>
+{% endblock %}
 
-  <footer class="text-center py-3">
-    <small>Copyright © 2024 AmiStore.</small>
-  </footer>
-
-  <!-- JS de BS5 -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
-  <!-- JS DATATABLE -->
-  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}
+  {# jQuery y showMessage se heredan de base.html #}
   <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
   <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
+
   <script>
     $(document).ready(function () {
-      $("#example").DataTable({
+      $("#dataTable").DataTable({
         language: {
-          url: "https://cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json",
+          url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-MX.json",
+          emptyTable: "No hay productos registrados en el inventario."
         },
         pageLength: 10,
         lengthMenu: [5, 10, 25, 50],
+        order: [[0, "asc"]],
+        columnDefs: [
+          { targets: 7, orderable: false, searchable: false }, // Columna de acciones
+        ],
+        responsive: true,
       });
-    });
-  </script>
 
-  <!--ENVIAR LOS DATOS DEL PRODUCTO AL MODAL DE EDITAR-->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-  // Llenar el formulario con los datos del producto cuando se abre el modal
-    document.querySelectorAll(".add-button").forEach(button => {
-      button.addEventListener("click", () => {
-        const productId = button.dataset.id;
-        const stock = button.dataset.stock;
-        const name = button.dataset.name;
-        const category = button.dataset.category;
-        const size = button.dataset.size;
-        const price = button.dataset.price;
+      // Cargar datos en el modal de ajuste de stock
+      $(".adjust-stock-button").on("click", function () {
+        const productId = $(this).data("id");
+        const productName = $(this).data("nombre");
+        const productStock = $(this).data("stock");
 
-        // Asignar los valores a los campos del modal
-        document.getElementById("productId").value = productId;
-        document.getElementById("productStock").value = stock;
-        document.getElementById("productName").value = name;
-        document.getElementById("productCategory").value = category;
-        document.getElementById("productSize").value = size;
-        document.getElementById("productPrice").value = price;
+        $("#adjProductId").val(productId);
+        $("#adjProductName").val(productName);
+        $("#adjProductStock").val(productStock);
+        $("#adjStockAdjustment").val(''); // Limpiar campo de ajuste
+        $("#adjStockAdjustment").removeClass('is-invalid'); // Limpiar validación
       });
-    });
-  });
-  
-    function adjustStock(action) {
-      const productId = document.getElementById("productId").value;
-      const currentStock = parseInt(document.getElementById("productStock").value);
-      const adjustment = parseInt(document.getElementById("stockAdjustment").value);
-  
-      if (isNaN(adjustment) || adjustment <= 0) {
-        alert("Por favor, introduce una cantidad válida.");
-        return;
+
+      function getCsrfToken() {
+        return $('input[name="csrfmiddlewaretoken"]').val();
       }
-  
-      const newStock = action === "increment" ? currentStock + adjustment : currentStock - adjustment;
-  
-      if (newStock < 0) {
-        alert("El stock no puede ser negativo.");
-        return;
-      }
-  
-      fetch(`/ajusteStock/${productId}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": "{{ csrf_token }}",
-        },
-        body: JSON.stringify({ adjustment: action === "increment" ? adjustment : -adjustment }),
-      })
-        .then(response => response.json())
+
+      function performStockAdjustment(actionType) {
+        const productId = $("#adjProductId").val();
+        const currentStock = parseInt($("#adjProductStock").val());
+        const adjustmentQuantity = parseInt($("#adjStockAdjustment").val());
+
+        if (isNaN(adjustmentQuantity) || adjustmentQuantity <= 0) {
+          showMessage('warning', "Por favor, introduce una cantidad válida y positiva para el ajuste.");
+          $("#adjStockAdjustment").addClass('is-invalid');
+          return;
+        }
+        $("#adjStockAdjustment").removeClass('is-invalid');
+
+        let newStock = currentStock;
+        let finalAdjustmentValue = adjustmentQuantity;
+
+        if (actionType === "decrement") {
+          if (currentStock < adjustmentQuantity) {
+            showMessage('danger', "No se puede restar más stock del disponible.");
+            return;
+          }
+          newStock -= adjustmentQuantity;
+          finalAdjustmentValue = -adjustmentQuantity; // Enviar como negativo al backend
+        } else if (actionType === "increment") {
+          newStock += adjustmentQuantity;
+          // finalAdjustmentValue ya es positivo
+        }
+
+        // Usar Fetch API
+        fetch(`/ajusteStock/${productId}/`, { // Asegúrate que esta URL es correcta y espera POST
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCsrfToken(), // Obtener el token CSRF
+          },
+          body: JSON.stringify({ 
+              adjustment: finalAdjustmentValue // El backend espera 'adjustment'
+          }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                // Si la respuesta no es OK, intentar parsear como JSON para obtener el error
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
         .then(data => {
-          if (data.status === "success") {
-            location.reload();
+          if (data.status === "success" || data.success) { // Aceptar 'success' o 'status:success'
+            showMessage('success', data.message || 'Stock ajustado correctamente.');
+            $('#updateStockModal').modal('hide');
+            location.reload(); // Recargar para ver los cambios
           } else {
-            alert("Error al ajustar el stock: " + data.message);
+            showMessage('danger', "Error al ajustar el stock: " + (data.message || data.error || 'Error desconocido.'));
           }
         })
         .catch(error => {
-          alert("Error en la solicitud: " + error);
+          let errorMsg = "Error en la solicitud de ajuste de stock.";
+          if (error && error.message) {
+            errorMsg += " " + error.message;
+          } else if (typeof error === 'string') {
+            errorMsg += " " + error;
+          }
+          showMessage('danger', errorMsg);
+          console.error("Error en Fetch:", error);
         });
-    }
-  </script>
-</body>
+      }
 
-</html>
+      $("#incrementStockBtn").on("click", function() {
+        performStockAdjustment('increment');
+      });
+
+      $("#decrementStockBtn").on("click", function() {
+        performStockAdjustment('decrement');
+      });
+    });
+  </script>
+{% endblock %}

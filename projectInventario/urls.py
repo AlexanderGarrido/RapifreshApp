@@ -18,18 +18,29 @@ from django.contrib import admin
 from django.urls import path
 from inventarioApp.views import *
 
+# Importaciones para servir archivos estáticos en desarrollo
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login_view, name='login'),
+    path('logout/', logout_view, name='logout'), # Nueva URL para cerrar sesión
     path('inicio/', inventario_view, name='inicio'),
     path('inventario/', inventario, name='inventario'),
     path('reports/', reports, name='reports'),
     path('inventarioEmp/', inventarioEmp, name='inventarioEmp'),
     path('inicioEmp/', inventario_viewEmp, name='inicioEmp'),
     path('usuarios/', usuario, name='usuarios'),
+    path('usuarios/agregar/', agregarUsuario, name='agregarUsuario'), # Nueva URL para agregar usuarios
     path('agregarProducto/', agregarProducto, name='agregarProducto'),
     path('ajusteStock/<int:producto_id>/', ajustarStock, name='ajustarStock'),
     path('modificarProducto/<int:producto_id>/', modificarProducto, name='modificarProducto'),
     path('eliminarProducto/<int:producto_id>/', eliminarProducto, name='eliminarProducto'),
 ]
+
+# Servir archivos estáticos solo en modo de desarrollo
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
+
