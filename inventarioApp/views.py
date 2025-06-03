@@ -108,6 +108,7 @@ def inventario(request):
     # Obtener parámetros de filtro de la URL
     nombre_filter = request.GET.get('nombre')
     categoria_filter = request.GET.get('categoria')
+    proveedor_filter = request.GET.get('proveedor')
     stock_min_filter = request.GET.get('stock_min')
 
     # Aplicar filtros si están presentes
@@ -115,6 +116,8 @@ def inventario(request):
         productos = productos.filter(nombre__icontains=nombre_filter)
     if categoria_filter:
         productos = productos.filter(categoria__icontains=categoria_filter)
+    if proveedor_filter:
+        productos = productos.filter(proveedor__icontains=proveedor_filter)
     if stock_min_filter:
         try:
             stock_min_filter = int(stock_min_filter)
@@ -190,11 +193,8 @@ def agregarProducto(request):
                 producto_id=nuevo_producto.id, # Guarda el ID del producto
                 nombre_producto=nuevo_producto.nombre, # Nombre del producto
                 descripcion=nuevo_producto.descripcion, # Asegurarse de pasar la descripción
+                proveedor=nuevo_producto.proveedor,
                 categoria=nuevo_producto.categoria,
-                talla=nuevo_producto.talla,
-                precio_anterior=0.00, # Precio anterior al agregar (0)
-                stock_anterior=0, # Stock anterior al agregar (0)
-                precio_nuevo=nuevo_producto.precio,
                 stock_nuevo=nuevo_producto.stock,
                 accion="Agregar (Administrador)",  # Tipo de acción
                 cantidad_ajustada=nuevo_producto.stock, # Cantidad total agregada
@@ -275,11 +275,8 @@ def ajustarStock(request, producto_id):
                 producto_id=producto.id, # Guarda el ID del producto
                 nombre_producto=producto.nombre, # Nombre del producto
                 descripcion=producto.descripcion, # Asegurarse de pasar la descripción
+                proveedor=producto.proveedor,
                 categoria=producto.categoria,
-                talla=producto.talla,
-                precio_anterior=producto.precio, # Precio antes del ajuste (asumiendo que no cambia)
-                stock_anterior=stock_anterior, # Stock antes del ajuste
-                precio_nuevo=producto.precio, # Precio después del ajuste
                 stock_nuevo=producto.stock, # Stock final después del ajuste
                 accion=accion_movimiento,
                 cantidad_ajustada=adjustment, # Cantidad ajustada (puede ser positiva o negativa)
@@ -312,26 +309,16 @@ def modificarProducto(request, producto_id):
             # Guardar los valores anteriores para el registro de movimiento
             nombre_anterior = producto.nombre
             descripcion_anterior = producto.descripcion
+            proveedor_anterior = producto.proveedor
             categoria_anterior = producto.categoria
-            talla_anterior = producto.talla
-            precio_anterior = producto.precio
-            stock_anterior = producto.stock
 
             # Capturar los datos enviados en la solicitud
             nombre = request.POST.get('nombre')
             descripcion = request.POST.get('descripcion')
+            proveedor = request.POST.get('proveedor')
             categoria = request.POST.get('categoria')
-            talla = request.POST.get('talla')
-            precio_str = request.POST.get('precio') # Obtener como string
             stock_str = request.POST.get('stock')   # Obtener como string
             
-            # Validar y convertir precio
-            precio_nuevo = producto.precio
-            if precio_str:
-                try:
-                    precio_nuevo = float(precio_str)
-                except ValueError:
-                    return JsonResponse({'success': False, 'error': 'Precio inválido. Debe ser un número.'}, status=400)
 
             # Validar y convertir stock
             stock_nuevo = producto.stock
@@ -344,9 +331,8 @@ def modificarProducto(request, producto_id):
             # Actualizar los campos del producto si se proporcionan y son válidos
             producto.nombre = nombre if nombre else producto.nombre
             producto.descripcion = descripcion if descripcion else producto.descripcion
+            producto.proveedor = proveedor if proveedor else producto.proveedor
             producto.categoria = categoria if categoria else producto.categoria
-            producto.talla = talla if talla else producto.talla
-            producto.precio = precio_nuevo
             producto.stock = stock_nuevo
 
             # Guardar cambios en la base de datos
@@ -357,11 +343,8 @@ def modificarProducto(request, producto_id):
                 producto_id=producto.id, # Guarda el ID del producto
                 nombre_producto=nombre_anterior, # Nombre anterior del producto
                 descripcion=descripcion_anterior, # Descripción anterior
+                proveedor=proveedor_anterior, # Proveedor anterior
                 categoria=categoria_anterior, # Categoría anterior
-                talla=talla_anterior, # Talla anterior
-                precio_anterior=precio_anterior,
-                stock_anterior=stock_anterior,
-                precio_nuevo=producto.precio, # Precio nuevo
                 stock_nuevo=producto.stock, # Stock nuevo
                 accion="Modificación (Administrador)",  # Tipo de acción
                 usuario=request.user if request.user.is_authenticated else None, # Registrar el usuario
@@ -389,11 +372,8 @@ def eliminarProducto(request, producto_id):
         producto_id=producto.id, # Guarda el ID del producto
         nombre_producto=producto.nombre, # Nombre del producto eliminado
         descripcion=producto.descripcion, # Asegurarse de pasar la descripción
-        talla=producto.talla,
+        proveedor=producto.proveedor,
         categoria=producto.categoria,
-        precio_anterior=producto.precio, # Precio que tenía antes de ser eliminado
-        stock_anterior=producto.stock, # El stock que tenía antes de ser eliminado
-        precio_nuevo=0.00, # Precio después de la eliminación (0)
         stock_nuevo=0, # Stock después de la eliminación (0)
         accion="Eliminación (Administrador)",  # Tipo de acción
         cantidad_ajustada=-producto.stock, # Cantidad ajustada (total eliminado)

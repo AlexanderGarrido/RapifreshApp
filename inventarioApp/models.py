@@ -7,26 +7,21 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 class Productos(models.Model):
     nombre = models.CharField(max_length=100)
-    descripcion = models.CharField(max_length=200)
-    precio = models.DecimalField(max_digits=10, decimal_places=2) # Cambiado a DecimalField para precios
-    categoria_choices = (
-        ('Pantalones', 'Pantalones'),
-        ('Poleras', 'Poleras'),
-        ('Zapatos', 'Zapatos'),
-    )
-    categoria = models.CharField(max_length=100, choices=categoria_choices, default='Poleras')
-    talla_choices = (
-        ('S', 'S'),
-        ('M', 'M'),
-        ('L', 'L'),
-        ('XL', 'XL'),
-        ('XXL', 'XXL'),
-    )
-    talla = models.CharField(max_length=50, choices=talla_choices, default='S') # Añadido choices aquí
     stock = models.IntegerField()
 
+    proveedor = models.CharField(max_length=100)
+
+    CATEGORIA_CHOICES = (
+        ('Indumentaria', 'Indumentaria'),
+        ('Herramientas', 'Herramientas'),
+        ('Cajas', 'Cajas'),
+        ('Film', 'Film'),
+        ('Bolsa', 'Bolsa'),
+    )
+    categoria = models.CharField(max_length=50, choices=CATEGORIA_CHOICES, default='Indumentaria')
+
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} - {self.categoria} - Stock: {self.stock}"
 
 # Manager personalizado para el modelo de usuario
 class CustomUserManager(BaseUserManager):
@@ -85,39 +80,29 @@ class Usuarios(AbstractBaseUser, PermissionsMixin): # Heredar de AbstractBaseUse
         return self.nombre
         
 class Movimiento(models.Model):
-    # Campos para el producto involucrado en el movimiento
-    # Usar ForeignKey si quieres integridad referencial y el producto NO se elimina
-    # Si el producto puede ser eliminado y quieres mantener el registro del movimiento,
-    # entonces IntegerField es adecuado, pero pierdes la integridad referencial.
-    producto_id = models.IntegerField(null=True, blank=True) # ID del producto
-    nombre_producto = models.CharField(max_length=100, null=True, blank=True) # Nombre del producto en el momento del movimiento
-    descripcion = models.CharField(max_length=200, blank=True, null=True) # Descripción del producto
-    categoria = models.CharField(max_length=50, null=True, blank=True) # Categoría del producto
-    talla = models.CharField(max_length=10, null=True, blank=True) # Talla del producto
-    color = models.CharField(max_length=50, blank=True, null=True) # Campo opcional, si es relevante
+    # Relación con el producto (si no se elimina)
+    producto_id = models.IntegerField(null=True, blank=True)  # ID del producto (referencia manual)
+    nombre_producto = models.CharField(max_length=100, null=True, blank=True)  # Nombre del producto en ese momento
+    proveedor = models.CharField(max_length=100, null=True, blank=True)  # Proveedor en ese momento
+    categoria = models.CharField(max_length=50, null=True, blank=True)  # Categoría en ese momento
 
-    # Campos para registrar el estado antes y después del movimiento
-    precio_anterior = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    # Estado del stock antes y después del movimiento
     stock_anterior = models.IntegerField(null=True, blank=True)
-    precio_nuevo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     stock_nuevo = models.IntegerField(null=True, blank=True)
-    cantidad_ajustada = models.IntegerField(null=True, blank=True) # Cantidad específica ajustada (para incrementos/decrementos)
+    cantidad_ajustada = models.IntegerField(null=True, blank=True)  # Cambio neto en el stock
 
-    # Información del movimiento
-    accion = models.CharField(max_length=50)  # Ej. "Agregar (Administrador)", "Modificación (Administrador)", "Ajuste (Empleado)", "Eliminación (Administrador)"
+    # Información sobre el tipo de acción
+    accion = models.CharField(max_length=50)  # Ej: "Agregar", "Editar", "Eliminar", etc.
     fecha = models.DateTimeField(auto_now_add=True)
-    
-    # Añadido: Campo para registrar qué usuario hizo el movimiento
-    # Si el usuario se elimina, el campo se pondrá a NULL
+
+    # Usuario responsable del cambio
     usuario = models.ForeignKey(Usuarios, on_delete=models.SET_NULL, null=True, blank=True)
     usuario_nombre = models.CharField(max_length=255, null=True, blank=True)
 
-
     def __str__(self):
-        # Muestra el tipo de acción, el nombre del producto, quién lo hizo y la fecha
         usuario_info = f" por {self.usuario_nombre}" if self.usuario_nombre else ""
         return f"{self.accion} - {self.nombre_producto or 'N/A'}{usuario_info} - {self.fecha.strftime('%d-%m-%Y %H:%M')}"
 
     class Meta:
-        # Ordenar los movimientos por fecha descendente por defecto
         ordering = ['-fecha']
+
