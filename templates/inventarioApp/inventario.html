@@ -46,14 +46,12 @@
     <table id="dataTable" class="table table-striped table-hover table-bordered align-middle w-100 shadow-sm rounded-3 overflow-hidden">
       <thead class="table-primary">
         <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Categoría</th>
-          <th>Talla</th>
-          <th>Precio</th>
-          <th>Stock</th>
-          <th class="text-center">Acciones</th>
+          <th>ID</th> <!-- ID de la fila -->
+          <th>Nombre</th> <!-- Nombre del producto -->
+          <th>Descripción</th> <!-- Descripción del producto -->
+          <th>Categoría</th> <!-- Categoría del producto -->
+          <th>Stock</th> <!-- Stock del producto -->
+          <th class="text-center">Acciones</th> <!-- Acciones del producto -->
         </tr>
       </thead>
       <tbody>
@@ -61,10 +59,8 @@
             <tr class="{% if producto.stock <= 3 %}table-danger{% elif producto.stock >= 4 and producto.stock <= 6 %}table-warning{% else %}table-light{% endif %}">
               <td class="text-center">{{ producto.id }}</td>
               <td>{{ producto.nombre }}</td>
-              <td>{{ producto.descripcion }}</td>
               <td>{{ producto.categoria }}</td>
-              <td class="text-center">{{ producto.talla }}</td>
-              <td class="text-end">${{ producto.precio|floatformat:2 }}</td>
+              <td>{{ producto.proveedor }}</td>
               <td class="text-center">{{ producto.stock }}</td>
               <td class="text-center">
                 <button
@@ -73,11 +69,9 @@
                   class="edit-button btn btn-sm btn-primary me-1"
                   data-id="{{ producto.id }}"
                   data-nombre="{{ producto.nombre }}"
-                  data-descripcion="{{ producto.descripcion }}"
                   data-categoria="{{ producto.categoria }}"
-                  data-talla="{{ producto.talla }}"
-                  data-precio="{{ producto.precio|stringformat:".2f" }}" {# Asegurar formato para JS #}
                   data-stock="{{ producto.stock }}"
+                  data-proveedor="{{ producto.proveedor }}"
                   title="Editar"
                 >
                   <i class="fa-solid fa-pen"></i>
@@ -149,23 +143,13 @@
           </div>
 
           <div class="mb-3">
-            <label for="editProductDescripcion" class="form-label">Descripción</label>
-            <textarea class="form-control" id="editProductDescripcion" name="descripcion" rows="3" required></textarea>
+            <label for="editProductProvider" class="form-label">Proveedor</label>
+            <input type="text" class="form-control" id="editProductProvider" name="proveedor" required>
           </div>
 
           <div class="mb-3">
             <label for="editProductCategory" class="form-label">Categoría</label>
             <input type="text" class="form-control" id="editProductCategory" name="categoria" required>
-          </div>
-
-          <div class="mb-3">
-            <label for="editProductSize" class="form-label">Talla</label>
-            <input type="text" class="form-control" id="editProductSize" name="talla" required>
-          </div>
-
-          <div class="mb-3">
-            <label for="editProductPrice" class="form-label">Precio</label>
-            <input type="number" step="0.01" class="form-control" id="editProductPrice" name="precio" required>
           </div>
 
           <div class="mb-3">
@@ -215,12 +199,8 @@
         const productId = $(this).data("id");
         $("#editProductId").val(productId); // ID del input hidden actualizado
         $("#editProductName").val($(this).data("nombre"));
-        $("#editProductDescripcion").val($(this).data("descripcion"));
         $("#editProductCategory").val($(this).data("categoria"));
-        $("#editProductSize").val($(this).data("talla"));
-        // Asegurar que el precio se carga correctamente como número
-        const price = parseFloat($(this).data("precio")).toFixed(2);
-        $("#editProductPrice").val(price);
+        $("#editProductProvider").val($(this).data("proveedor"));
         $("#editProductStock").val($(this).data("stock"));
       });
   

@@ -36,10 +36,8 @@
         <tr>
           <th>ID</th>
           <th>Nombre</th>
-          <th>Descripción</th>
           <th>Categoría</th>
-          <th>Talla</th>
-          <th>Precio</th>
+          <th>Proveedor</th>
           <th>Stock</th>
           <th class="text-center">Acciones</th>
         </tr>
@@ -51,8 +49,7 @@
               <td>{{ producto.nombre }}</td>
               <td>{{ producto.descripcion }}</td>
               <td>{{ producto.categoria }}</td>
-              <td class="text-center">{{ producto.talla }}</td>
-              <td class="text-end">${{ producto.precio|floatformat:2 }}</td>
+              <td>{{ producto.proveedor }}</td>
               <td class="text-center">{{ producto.stock }}</td>
               <td class="text-center">
                 <button
