@@ -23,6 +23,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login_view, name='login'),
@@ -38,6 +39,9 @@ urlpatterns = [
     path('ajusteStock/<int:producto_id>/', ajustarStock, name='ajustarStock'),
     path('modificarProducto/<int:producto_id>/', modificarProducto, name='modificarProducto'),
     path('eliminarProducto/<int:producto_id>/', eliminarProducto, name='eliminarProducto'),
+    path('qr-scan/', qr_scan_page, name='qr_scan_page'),
+    path('process-qr/', process_qr_code, name='process_qr_code'),
+
 ]
 
 # Servir archivos estáticos solo en modo de desarrollo

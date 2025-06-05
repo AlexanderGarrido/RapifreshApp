@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseRedirect, JsonResponse
 from datetime import datetime
 from django.db.models import Q
@@ -35,6 +36,55 @@ def Empleado_required(view_func):
     return decorated_view_func
 
 # --- Vistas ---
+
+def qr_scan_page(request):
+    """Vista que muestra la página del escáner QR"""
+    return render(request, 'inventarioApp/qr_scanner.html')
+
+@csrf_exempt
+def process_qr_code(request):
+    """Vista que procesa el código QR escaneado"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            qr_code = data.get('qr_code', '')
+            
+            # Aquí puedes procesar el código QR como necesites
+            # Por ejemplo, buscar en la base de datos, validar, etc.
+            
+            # Ejemplo de procesamiento básico:
+            if qr_code:
+                # Procesa tu código QR aquí
+                result = {
+                    'success': True,
+                    'message': f'Código QR procesado: {qr_code}',
+                    'qr_data': qr_code
+                }
+                
+                # Opcional: Guardar en base de datos o hacer alguna acción
+                # process_qr_data(qr_code)
+                
+            else:
+                result = {
+                    'success': False,
+                    'message': 'No se recibió código QR válido'
+                }
+                
+            return JsonResponse(result)
+            
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'success': False,
+                'message': 'Error al procesar los datos'
+            })
+    
+    return JsonResponse({
+        'success': False,
+        'message': 'Método no permitido'
+    })
+
+
+
 
 # Login de inicio de sesion
 def login_view(request):
