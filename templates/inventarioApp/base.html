@@ -20,7 +20,7 @@
 
   <header class="p-3 mb-3 border-bottom shadow-sm bg-dark text-white">
     <div class="container">
-      <nav class="navbar navbar-expand-lg navbar-dark"
+      <nav class="navbar navbar-expand-lg navbar-dark">
         {# Logo principal de Rapifresh y enlace a la página de inicio según el rol #}
         <a class="navbar-brand fw-bold d-flex align-items-center" href="{% if request.user.is_authenticated and request.user.rol == 'Empleado' %}{% url 'inicioEmp' %}{% else %}{% url 'inicio' %}{% endif %}">
           <img src="{% static 'img/logoRapifresh.avif' %}" alt="Logo Rapifresh" class="img-fluid me-2 main-brand-logo">
