@@ -34,6 +34,10 @@
             <label for="categoryFilter" class="form-label fw-bold">Categoría</label>
             <input type="text" id="categoryFilter" name="categoria" class="form-control" value="{{ request.GET.categoria|default:'' }}">
         </div>
+        <div class="col-md-3">
+            <label for="proveedorFilter" class="form-label fw-bold">Proveedor</label>
+            <input type="text" id="proveedorFilter" name="proveedor" class="form-control" value="{{ request.GET.proveedor|default:'' }}">
+        </div>
         <div class="col-md-2">
             <label for="stockFilter" class="form-label fw-bold">Stock Mínimo</label>
             <input type="number" id="stockFilter" name="stock_min" class="form-control" value="{{ request.GET.stock_min|default:'' }}" min="0">
@@ -51,8 +55,8 @@
         <tr>
           <th>ID</th> <!-- ID de la fila -->
           <th>Nombre</th> <!-- Nombre del producto -->
-          <th>Descripción</th> <!-- Descripción del producto -->
           <th>Categoría</th> <!-- Categoría del producto -->
+          <th>Proveedor</th> <!-- Proveedor del producto -->
           <th>Stock</th> <!-- Stock del producto -->
           <th class="text-center">Acciones</th> <!-- Acciones del producto -->
         </tr>
@@ -73,8 +77,8 @@
                   data-id="{{ producto.id }}"
                   data-nombre="{{ producto.nombre }}"
                   data-categoria="{{ producto.categoria }}"
-                  data-stock="{{ producto.stock }}"
                   data-proveedor="{{ producto.proveedor }}"
+                  data-stock="{{ producto.stock }}"
                   title="Editar"
                 >
                   <i class="fa-solid fa-pen"></i>
@@ -121,7 +125,9 @@
               </div>
             </div>
           {% empty %}
-             {# DataTables mostrará "No hay productos..." si está vacío #}
+             <tr>
+               <td colspan="6" class="text-center">No hay productos registrados.</td>
+             </tr>
           {% endfor %}
       </tbody>
     </table>
@@ -138,7 +144,7 @@
       <div class="modal-body">
         <form id="editProductForm">
           {% csrf_token %}
-          <input type="hidden" id="editProductId" name="id"> {# ID cambiado para evitar conflicto #}
+          <input type="hidden" id="productIdToEdit" name="id"> {# ID cambiado para evitar conflicto #}
 
           <div class="mb-3">
             <label for="editProductName" class="form-label">Nombre</label>
@@ -146,13 +152,13 @@
           </div>
 
           <div class="mb-3">
-            <label for="editProductProvider" class="form-label">Proveedor</label>
-            <input type="text" class="form-control" id="editProductProvider" name="proveedor" required>
-          </div>
-
-          <div class="mb-3">
             <label for="editProductCategory" class="form-label">Categoría</label>
             <input type="text" class="form-control" id="editProductCategory" name="categoria" required>
+          </div>          
+
+          <div class="mb-3">
+            <label for="editProductSupplier" class="form-label">Proveedor</label>
+            <input type="text" class="form-control" id="editProductSupplier" name="proveedor" required>
           </div>
 
           <div class="mb-3">
@@ -172,6 +178,7 @@
 
 {% block extra_js %}
   {# jQuery y showMessage se heredan de base.html #}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
   <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -189,7 +196,7 @@
         lengthMenu: [5, 10, 25, 50],
         order: [[0, "asc"]],
         columnDefs: [
-          { targets: 7, orderable: false, searchable: false }, // Columna de acciones
+          { targets: 5, orderable: false, searchable: false }, // Columna de acciones
         ],
         responsive: true,
         // Deshabilitar la búsqueda y ordenación de DataTables si los filtros del form se encargan de ello
@@ -198,13 +205,14 @@
       });
 
       // Cargar datos en el modal de edición
-      $(".edit-button").on("click", function () {
-        const productId = $(this).data("id");
-        $("#editProductId").val(productId); // ID del input hidden actualizado
-        $("#editProductName").val($(this).data("nombre"));
-        $("#editProductCategory").val($(this).data("categoria"));
-        $("#editProductProvider").val($(this).data("proveedor"));
-        $("#editProductStock").val($(this).data("stock"));
+      $(document).on('click', '.edit-button', function () {
+        console.log("Click en botón de editar"); 
+        var button = $(this);
+        $('#productIdToEdit').val(button.data('id'));
+        $('#editProductName').val(button.data('nombre'));
+        $('#editProductCategory').val(button.data('categoria'));
+        $('#editProductSupplier').val(button.data('proveedor'));
+        $('#editProductStock').val(button.data('stock'));
       });
   
       // Guardar cambios del producto (AJAX)
@@ -220,10 +228,8 @@
           // headers: {"X-CSRFToken": "{{ csrf_token }}"}, // Alternativa si el token no está en formData
           success: function (response) {
             if (response.success) {
-              showMessage('success', 'Producto actualizado correctamente.');
               $('#editProductModal').modal('hide');
-              // Opcional: Actualizar la fila en DataTables sin recargar la página
-              // dataTableInstance.row(...).data(...).draw(); o location.reload();
+              showMessage('success', 'Producto actualizado correctamente.');
               location.reload(); // Recarga para ver cambios
             } else {
               let errorMessage = 'Error al actualizar el producto.';

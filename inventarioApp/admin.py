@@ -7,7 +7,7 @@ from inventarioApp.models import *
 
 
 class ProductosAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'categoria', 'stock', 'proveedor')
+    list_display = ('nombre', 'categoria','proveedor', 'stock')
     # Añade filtros y búsqueda para facilitar la gestión
     list_filter = ('categoria', 'proveedor')
     search_fields = ('nombre', 'descripcion')

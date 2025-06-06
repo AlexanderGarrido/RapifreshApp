@@ -86,7 +86,7 @@ pymysql.install_as_MySQLdb()
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'inventarioropa',
+        'NAME': 'inventariorapifresh',
         'USER': 'root',
         'PASSWORD': '', # ¡CAMBIAR EN PRODUCCIÓN!
         'HOST': '127.0.0.1',

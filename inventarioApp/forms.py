@@ -38,10 +38,11 @@ class ProductosForm(forms.ModelForm): # Renombrado a ProductosForm (capitalizado
         fields = ['nombre', 'categoria', 'proveedor', 'stock']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del producto'}),
-            'stock': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Stock del producto'}),
-            'proveedor': forms.Select(attrs={'class': 'form-control'}),     # Django usa Select para ChoiceField  
             'categoria': forms.Select(attrs={'class': 'form-control'}), # Django usa Select para ChoiceField
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del producto', 'rows': 3}),
+            'proveedor': forms.TextInput(attrs={'class': 'form-control'}),     # Django usa Select para ChoiceField  
+            'stock': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Stock del producto'}),
+            
+            
         }
     
     # Si quisieras añadir validaciones adicionales o modificar campos, lo harías aquí
