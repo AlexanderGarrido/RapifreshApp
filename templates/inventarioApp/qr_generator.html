@@ -1,0 +1,309 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Códigos QR</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="{% static 'css/qr_scanner.css' %}">
+    
+    
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="scanner-container">
+                    <div class="text-center mb-4">
+                        <h2 class="text-primary">
+                            <i class="fas fa-qrcode me-2"></i>
+                            Generador de Códigos QR
+                        </h2>
+                        <p class="text-muted">Crea códigos QR para texto, URLs, o cualquier información</p>
+                    </div>
+
+                    <!-- Formulario -->
+                    <form id="qr-form">
+                        <div class="form-floating mb-3">
+                            <textarea 
+                                class="form-control" 
+                                id="qr-text" 
+                                placeholder="Ingresa el texto o URL..."
+                                style="height: 100px"
+                                maxlength="500"
+                            ></textarea>
+                            <label for="qr-text">
+                                <i class="fas fa-edit me-2"></i>
+                                Texto o URL para el código QR
+                            </label>
+                            <div class="form-text">
+                                <small>
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Puedes ingresar texto, URLs, números de teléfono, etc.
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Sugerencias de URL -->
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-lightbulb me-1"></i>
+                                Ejemplos de URLs:
+                            </small>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm me-2 mb-1 url-suggestion" data-url="https://www.google.com">
+                                    <i class="fas fa-globe me-1"></i>Google
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm me-2 mb-1 url-suggestion" data-url="https://www.youtube.com">
+                                    <i class="fab fa-youtube me-1"></i>YouTube
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm me-2 mb-1 url-suggestion" data-url="https://wa.me/">
+                                    <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-3">
+                            <button type="submit" id="generate-btn" class="btn btn-danger btn-lg">
+                                <i class="fas fa-magic me-2"></i>
+                                Generar Código QR
+                            </button>
+                            <div class="loading-spinner mt-2">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Generando...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Generando código QR...</p>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Resultado del QR -->
+                    <div id="qr-result-container" class="d-none">
+                        <div class="qr-preview text-center">
+                            <img id="qr-image" src="" alt="Código QR generado" class="d-none">
+                            <div id="qr-placeholder" class="text-muted">
+                                <i class="fas fa-qrcode fa-3x mb-3"></i>
+                                <p>Tu código QR aparecerá aquí</p>
+                            </div>
+                        </div>
+                        
+                        <div id="url-preview" class="url-preview d-none">
+                            <strong><i class="fas fa-link me-2"></i>URL detectada:</strong>
+                            <br>
+                            <a id="url-link" href="#" target="_blank" class="text-decoration-none"></a>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button id="download-btn" class="btn btn-download me-2 d-none">
+                                <i class="fas fa-download me-2"></i>
+                                Descargar QR
+                            </button>
+                            <button id="share-btn" class="btn btn-outline-primary d-none">
+                                <i class="fas fa-share-alt me-2"></i>
+                                Compartir
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Mensajes de estado -->
+                    <div class="status-message">
+                        <div id="message" class="alert d-none" role="alert"></div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button onclick="history.back()" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Volver
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQRData = null;
+
+        // Sugerencias de URL
+        document.querySelectorAll('.url-suggestion').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const url = this.dataset.url;
+                document.getElementById('qr-text').value = url;
+            });
+        });
+
+        // Función para mostrar mensajes
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : type === 'danger' ? 'exclamation' : 'info'}-circle me-2"></i>${message}`;
+            messageDiv.classList.remove('d-none');
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.classList.add('d-none');
+                }, 5000);
+            }
+        }
+
+        // Función para validar si es URL
+        function isValidURL(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                try {
+                    new URL('https://' + string);
+                    return string.includes('.') && !string.includes(' ');
+                } catch (_) {
+                    return false;
+                }
+            }
+        }
+
+        // Función para formatear URL
+        function formatURL(urlString) {
+            try {
+                new URL(urlString);
+                return urlString;
+            } catch (_) {
+                return 'https://' + urlString;
+            }
+        }
+
+        // Función para generar QR
+        async function generateQR(text) {
+            try {
+                const response = await fetch('{% url "create_qr_code" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentQRData = data;
+                    
+                    // Mostrar el QR
+                    const qrImage = document.getElementById('qr-image');
+                    const qrPlaceholder = document.getElementById('qr-placeholder');
+                    const resultContainer = document.getElementById('qr-result-container');
+                    
+                    qrImage.src = data.qr_image;
+                    qrImage.classList.remove('d-none');
+                    qrPlaceholder.classList.add('d-none');
+                    resultContainer.classList.remove('d-none');
+                    
+                    // Si es URL, mostrar preview
+                    if (isValidURL(text)) {
+                        const finalURL = formatURL(text);
+                        const urlPreview = document.getElementById('url-preview');
+                        const urlLink = document.getElementById('url-link');
+                        
+                        urlLink.href = finalURL;
+                        urlLink.textContent = finalURL;
+                        urlPreview.classList.remove('d-none');
+                    } else {
+                        document.getElementById('url-preview').classList.add('d-none');
+                    }
+                    
+                    // Mostrar botones
+                    document.getElementById('download-btn').classList.remove('d-none');
+                    document.getElementById('share-btn').classList.remove('d-none');
+                    
+                    showMessage(data.message, 'success');
+                } else {
+                    showMessage(data.message, 'danger');
+                }
+            } catch (error) {
+                showMessage('Error al generar el código QR', 'danger');
+                console.error('Error:', error);
+            }
+        }
+
+        // Función para descargar QR
+        function downloadQR() {
+            if (currentQRData) {
+                const link = document.createElement('a');
+                link.download = 'codigo_qr.png';
+                link.href = currentQRData.qr_image;
+                link.click();
+            }
+        }
+
+        // Función para compartir
+        async function shareQR() {
+            if (currentQRData && navigator.share) {
+                try {
+                    const response = await fetch(currentQRData.qr_image);
+                    const blob = await response.blob();
+                    const file = new File([blob], 'codigo_qr.png', { type: 'image/png' });
+                    
+                    await navigator.share({
+                        title: 'Código QR',
+                        text: `Código QR para: ${currentQRData.text}`,
+                        files: [file]
+                    });
+                } catch (error) {
+                    // Fallback: copiar al portapapeles
+                    navigator.clipboard.writeText(currentQRData.text);
+                    showMessage('Texto copiado al portapapeles', 'info');
+                }
+            } else {
+                // Fallback: copiar al portapapeles
+                if (currentQRData) {
+                    navigator.clipboard.writeText(currentQRData.text);
+                    showMessage('Texto copiado al portapapeles', 'info');
+                }
+            }
+        }
+
+        // Event listeners
+        document.getElementById('qr-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const text = document.getElementById('qr-text').value.trim();
+            if (!text) {
+                showMessage('Por favor ingresa el texto o URL para generar el código QR', 'warning');
+                return;
+            }
+            
+            // Mostrar loading
+            const generateBtn = document.getElementById('generate-btn');
+            const loadingSpinner = document.querySelector('.loading-spinner');
+            
+            generateBtn.classList.add('d-none');
+            loadingSpinner.style.display = 'block';
+            
+            try {
+                await generateQR(text);
+            } finally {
+                // Ocultar loading
+                generateBtn.classList.remove('d-none');
+                loadingSpinner.style.display = 'none';
+            }
+        });
+
+        document.getElementById('download-btn').addEventListener('click', downloadQR);
+        document.getElementById('share-btn').addEventListener('click', shareQR);
+
+        // Auto-resize textarea
+        const textarea = document.getElementById('qr-text');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+    </script>
+</body>
+</html>

@@ -41,6 +41,8 @@ urlpatterns = [
     path('eliminarProducto/<int:producto_id>/', eliminarProducto, name='eliminarProducto'),
     path('qr-scan/', qr_scan_page, name='qr_scan_page'),
     path('process-qr/', process_qr_code, name='process_qr_code'),
+    path('generate-qr/', generate_qr_code, name='generate_qr_code'),
+    path('create-qr/', create_qr_code, name='create_qr_code'),
 
 ]
 

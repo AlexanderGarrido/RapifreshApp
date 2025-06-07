@@ -12,6 +12,11 @@ from django.http import HttpResponseRedirect, JsonResponse
 from datetime import datetime
 from django.db.models import Q
 import json
+#Nuevos imports
+import qrcode
+import io
+import base64
+from django.views.decorators.http import require_http_methods
 
 # --- Decoradores personalizados para roles ---
 
@@ -37,6 +42,8 @@ def Empleado_required(view_func):
 
 # --- Vistas ---
 
+
+#Vista del QR
 def qr_scan_page(request):
     """Vista que muestra la página del escáner QR"""
     return render(request, 'inventarioApp/qr_scanner.html')
@@ -81,9 +88,63 @@ def process_qr_code(request):
     return JsonResponse({
         'success': False,
         'message': 'Método no permitido'
-    })
+    })#
 
 
+#Generador de QR
+def generate_qr_code(request):
+    """Vista para mostrar el formulario de generación de códigos QR"""
+    return render(request, 'inventarioApp/qr_generator.html')
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def create_qr_code(request):
+    """Vista AJAX para crear el código QR"""
+    try:
+        data = json.loads(request.body)
+        text = data.get('text', '').strip()
+        
+        if not text:
+            return JsonResponse({
+                'success': False,
+                'message': 'Por favor ingresa el texto o URL para generar el código QR'
+            })
+        
+        # Crear el código QR
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(text)
+        qr.make(fit=True)
+        
+        # Crear la imagen
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convertir a base64
+        buffer = io.BytesIO()
+        img.save(buffer, format='PNG')
+        img_str = base64.b64encode(buffer.getvalue()).decode()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Código QR generado exitosamente',
+            'qr_image': f'data:image/png;base64,{img_str}',
+            'text': text
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'message': 'Error en los datos enviados'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Error al generar el código QR: {str(e)}'
+        })
 
 
 # Login de inicio de sesion
