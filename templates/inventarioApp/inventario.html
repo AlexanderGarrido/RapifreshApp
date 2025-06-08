@@ -90,47 +90,19 @@
                   type="button"
                   class="btn btn-sm btn-danger"
                   data-bs-toggle="modal"
-                  data-bs-target="#deleteProductModal{{ producto.id }}"
+                  data-bs-target="#deleteProductModal"
+                  data-id="{{ producto.id }}"
+                  data-nombre="{{ producto.nombre }}"
                   title="Eliminar"
                 >
                   <i class="fa-solid fa-trash"></i>
                 </button>
               </td>
             </tr>
-  
-            <div
-              class="modal fade"
-              id="deleteProductModal{{ producto.id }}"
-              tabindex="-1"
-              aria-labelledby="deleteProductModalLabel{{ producto.id }}"
-              aria-hidden="true"
-            >
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteProductModalLabel{{ producto.id }}">Confirmar Eliminación</h5>
-                    <button
-                      type="button"
-                      class="btn-close btn-close-white"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"
-                    ></button>
-                  </div>
-                  <div class="modal-body">
-                    <p>¿Estás seguro de que deseas eliminar el producto <strong>{{ producto.nombre }}</strong> (ID: {{ producto.id }})?</p>
-                    <p class="text-danger fw-bold">Esta acción no se puede deshacer.</p>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <a href="{% url 'eliminarProducto' producto.id %}" class="btn btn-danger">Eliminar</a>
-                  </div>
-                </div>
-              </div>
-            </div>
           {% empty %}
-             <tr>
-               <td colspan="6" class="text-center">No hay productos registrados.</td>
-             </tr>
+            <tr>
+              <td colspan="6" class="text-center">No hay productos registrados.</td>
+            </tr>
           {% endfor %}
       </tbody>
     </table>
@@ -177,118 +149,150 @@
     </div>
   </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
-  {# jQuery y showMessage se heredan de base.html #}
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
-  <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<!-- Modal de eliminar producto (único, se rellena dinámicamente) -->
+<div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteProductModalLabel">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar el producto <strong id="deleteProductName"></strong> (ID: <span id="deleteProductId"></span>)?</p>
+        <p class="text-danger fw-bold">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <a href="#" id="deleteProductConfirmBtn" class="btn btn-danger">Eliminar</a>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <script>
-    $(document).ready(function () {
-      $("#dataTable").DataTable({
-        language: {
-          url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-MX.json",
-          emptyTable: "No hay productos registrados en el inventario."
-        },
-        pageLength: 10,
-        lengthMenu: [5, 10, 25, 50],
-        order: [[0, "asc"]],
-        columnDefs: [
-          { targets: 5, orderable: false, searchable: false }, // Columna de acciones
-        ],
-        responsive: true,
-        // Deshabilitar la búsqueda y ordenación de DataTables si los filtros del form se encargan de ello
-        searching: false, // Deshabilitar la búsqueda de DataTables
-        ordering: false,  // Deshabilitar la ordenación de DataTables
-      });
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    // Cargar datos en el modal de edición
+    $(document).on('click', '.edit-button', function () {
+      var button = $(this);
+      $('#productIdToEdit').val(button.data('id'));
+      $('#editProductName').val(button.data('nombre'));
+      $('#editProductCategory').val(button.data('categoria'));
+      $('#editProductSupplier').val(button.data('proveedor'));
+      $('#editProductStock').val(button.data('stock'));
+    });
 
-      // Cargar datos en el modal de edición
-      $(document).on('click', '.edit-button', function () {
-        console.log("Click en botón de editar"); 
-        var button = $(this);
-        $('#productIdToEdit').val(button.data('id'));
-        $('#editProductName').val(button.data('nombre'));
-        $('#editProductCategory').val(button.data('categoria'));
-        $('#editProductSupplier').val(button.data('proveedor'));
-        $('#editProductStock').val(button.data('stock'));
-      });
-  
-      // Guardar cambios del producto (AJAX)
-      $("#saveProductChangesBtn").on("click", function () {
-        const productId = $("#editProductId").val(); // ID del input hidden actualizado
-        const formData = $("#editProductForm").serialize();
-  
-        $.ajax({
-          url: `/modificarProducto/${productId}/`, // Asegúrate que esta URL es correcta
-          type: "POST",
-          data: formData,
-          // Django espera el CSRF token en el header para AJAX POST si no está en el form data
-          // headers: {"X-CSRFToken": "{{ csrf_token }}"}, // Alternativa si el token no está en formData
-          success: function (response) {
-            if (response.success) {
-              $('#editProductModal').modal('hide');
-              showMessage('success', 'Producto actualizado correctamente.');
-              location.reload(); // Recarga para ver cambios
-            } else {
-              let errorMessage = 'Error al actualizar el producto.';
-              if (response.errors) {
-                  errorMessage += ' Detalles: ' + JSON.stringify(response.errors);
-              } else if (response.error) {
-                  errorMessage += ' ' + response.error;
-              }
-              showMessage('danger', errorMessage);
+    // Cargar datos en el modal de eliminar
+    $(document).on('click', '.btn-danger[data-bs-target="#deleteProductModal"]', function () {
+      var button = $(this);
+      var id = button.data('id');
+      var nombre = button.data('nombre');
+      $('#deleteProductId').text(id);
+      $('#deleteProductName').text(nombre);
+      $('#deleteProductConfirmBtn').attr('href', `/eliminarProducto/${id}/`);
+    });
+
+    // Guardar cambios del producto (AJAX)
+    $("#saveProductChangesBtn").on("click", function (e) {
+      e.preventDefault(); // Evita submit por defecto
+      const productId = $("#productIdToEdit").val();
+      const formData = $("#editProductForm").serialize();
+
+      $.ajax({
+        url: `/modificarProducto/${productId}/`,
+        type: "POST",
+        data: formData,
+        success: function (response) {
+          if (response.success) {
+            $('#editProductModal').modal('hide');
+            showMessage('success', 'Producto actualizado correctamente.');
+            location.reload();
+          } else {
+            let errorMessage = 'Error al actualizar el producto.';
+            if (response.errors) {
+              errorMessage += ' Detalles: ' + JSON.stringify(response.errors);
+            } else if (response.error) {
+              errorMessage += ' ' + response.error;
             }
-          },
-          error: function (xhr, status, error) {
-            showMessage('danger', 'Ocurrió un error inesperado. Revisa la consola para más detalles.');
-            console.error("Error AJAX:", status, error, xhr.responseText);
-          },
-        });
-      });
-
-      // Exportar a PDF
-      $('#exportPdfBtn').on('click', function () {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const table = document.getElementById('dataTable');
-
-        doc.setFontSize(18);
-        doc.text("Reporte de Inventario - Rapifresh", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
-
-        doc.autoTable({
-          html: table,
-          startY: 30,
-          theme: 'striped',
-          headStyles: { fillColor: [23, 162, 184] }, // Color primary de Bootstrap
-          styles: { fontSize: 8, cellPadding: 2 },
-          columnStyles: {
-            5: { halign: 'right' }, // Precio
-            6: { halign: 'center' }  // Stock
-          },
-          didDrawPage: function (data) {
-            // Footer
-            let str = "Página " + doc.internal.getNumberOfPages();
-            doc.setFontSize(10);
-            doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+            showMessage('danger', errorMessage);
           }
-        });
-
-        doc.save('inventario_rapifresh.pdf');
-      });
-
-      // Exportar a Excel
-      $('#exportExcelBtn').on('click', function () {
-        const table = document.getElementById('dataTable');
-        const ws = XLSX.utils.table_to_sheet(table);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Inventario");
-        XLSX.writeFile(wb, "inventario_rapifresh.xlsx");
+        },
+        error: function (xhr, status, error) {
+          showMessage('danger', 'Ocurrió un error inesperado. Revisa la consola para más detalles.');
+          console.error("Error AJAX:", status, error, xhr.responseText);
+        },
       });
     });
-  </script>
+
+    // Eliminar producto (redirige)
+    $("#deleteProductConfirmBtn").on("click", function (e) {
+      // Si es un <a href>, permite la navegación normal
+      // Si quieres hacerlo por AJAX, aquí puedes poner el código AJAX
+      // Por defecto, el enlace ya tiene el href correcto
+    });
+
+    // Exportar a PDF
+    $('#exportPdfBtn').on('click', function () {
+      const table = document.getElementById('dataTable');
+      const doc = new jsPDF();
+      doc.text("Reporte de Inventario - Rapifresh", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
+
+      doc.autoTable({
+        html: table,
+        startY: 30,
+        theme: 'striped',
+        headStyles: { fillColor: [23, 162, 184] },
+        styles: { fontSize: 8, cellPadding: 2 },
+        columnStyles: {
+          4: { halign: 'center' }, // Stock
+          5: { halign: 'center' }  // Acciones
+        },
+        didDrawPage: function (data) {
+          let str = "Página " + doc.internal.getNumberOfPages();
+          doc.setFontSize(10);
+          doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+        }
+      });
+
+      doc.save('inventario_rapifresh.pdf');
+    });
+
+    // Exportar a Excel
+    $('#exportExcelBtn').on('click', function () {
+      const table = document.getElementById('dataTable');
+      const ws = XLSX.utils.table_to_sheet(table);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Inventario");
+      XLSX.writeFile(wb, "inventario_rapifresh.xlsx");
+    });
+  });
+
+  // Configurar CSRF para AJAX
+  function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!(/^GET|HEAD|OPTIONS|TRACE$/i.test(settings.type)) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          }
+      }
+  });
+
+  function showMessage(type, message) {
+    alert(message); // Solución rápida para depuración
+  }
+</script>
 {% endblock %}
