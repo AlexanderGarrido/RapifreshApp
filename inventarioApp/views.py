@@ -286,30 +286,30 @@ def agregarUsuario(request):
     return render(request, 'inventarioApp/agregarUsuario.html', {'form': form})
 
 
-@Administrador_required # Solo accesible por 'Administrador'
+@Administrador_required
 def agregarProducto(request):
     """
     Vista para agregar un nuevo producto al inventario.
     Registra el movimiento en la tabla Movimiento.
     """
-    form = ProductosForm() # Usar el ModelForm
+    form = ProductosForm()
     if request.method == 'POST':
-        form = ProductosForm(request.POST) # Usar el ModelForm
+        form = ProductosForm(request.POST)
         if form.is_valid():
-            # Guardar el nuevo producto directamente desde el formulario
             nuevo_producto = form.save()
 
             # Registrar el movimiento de "agregar" en la tabla Movimiento
             Movimiento.objects.create(
-                producto_id=nuevo_producto.id, # Guarda el ID del producto
-                nombre_producto=nuevo_producto.nombre, # Nombre del producto
+                producto_id=nuevo_producto.id,
+                nombre_producto=nuevo_producto.nombre,
                 categoria=nuevo_producto.categoria,
                 proveedor=nuevo_producto.proveedor,
+                stock_anterior=0,  # ← AGREGADO: Para productos nuevos el stock anterior es 0
                 stock_nuevo=nuevo_producto.stock,
-                accion="Agregar (Administrador)",  # Tipo de acción
-                cantidad_ajustada=nuevo_producto.stock, # Cantidad total agregada
-                usuario=request.user if request.user.is_authenticated else None, # Registrar el usuario
-                usuario_nombre=request.user.get_full_name() if request.user.is_authenticated else "Administrador", #
+                accion="Agregar (Administrador)",
+                cantidad_ajustada=nuevo_producto.stock,
+                usuario=request.user if request.user.is_authenticated else None,
+                usuario_nombre=request.user.get_full_name() if request.user.is_authenticated else "Administrador",
             )
 
             messages.success(request, 'Producto agregado exitosamente.')
@@ -352,7 +352,7 @@ def reports(request):
 
     return render(request, 'inventarioApp/reports.html', {'movimientos': movimientos})
 
-@Empleado_required # Solo accesible por 'Empleado'
+@Empleado_required
 def ajustarStock(request, producto_id):
     """
     Vista AJAX para ajustar el stock de un producto.
@@ -367,7 +367,7 @@ def ajustarStock(request, producto_id):
                 return JsonResponse({"status": "error", "message": "El ajuste no puede ser cero."}, status=400)
 
             producto = get_object_or_404(Productos, id=producto_id)
-            stock_anterior = producto.stock # Guardar el stock anterior para el registro
+            stock_anterior = producto.stock  # Guardar el stock anterior
             new_stock = producto.stock + adjustment
 
             if new_stock < 0:
@@ -377,19 +377,19 @@ def ajustarStock(request, producto_id):
             producto.stock = new_stock
             producto.save()
 
-            # Determinar el tipo de acción para el registro
             accion_movimiento = "Ajuste (Empleado)"
             
             # Registrar el movimiento
             Movimiento.objects.create(
-                producto_id=producto.id, # Guarda el ID del producto
-                nombre_producto=producto.nombre, # Nombre del producto
+                producto_id=producto.id,
+                nombre_producto=producto.nombre,
                 categoria=producto.categoria,
                 proveedor=producto.proveedor,
-                stock_nuevo=producto.stock, # Stock final después del ajuste
+                stock_anterior=stock_anterior,  # ← CORREGIDO: Ahora sí se guarda el stock anterior
+                stock_nuevo=producto.stock,
                 accion=accion_movimiento,
-                cantidad_ajustada=adjustment, # Cantidad ajustada (puede ser positiva o negativa)
-                usuario=request.user if request.user.is_authenticated else None, # Registrar el usuario
+                cantidad_ajustada=adjustment,
+                usuario=request.user if request.user.is_authenticated else None,
                 usuario_nombre=request.user.get_full_name() if request.user.is_authenticated else "Empleado",
             )
 
@@ -404,7 +404,7 @@ def ajustarStock(request, producto_id):
     return JsonResponse({"status": "error", "message": "Método no permitido."}, status=405)
 
 
-@Administrador_required # Solo accesible por 'Administrador'
+@Administrador_required
 def modificarProducto(request, producto_id):
     """
     Vista AJAX para modificar los detalles de un producto.
@@ -412,20 +412,18 @@ def modificarProducto(request, producto_id):
     """
     if request.method == 'POST':
         try:
-            # Obtener el producto por ID
             producto = get_object_or_404(Productos, id=producto_id)
 
             # Guardar los valores anteriores para el registro de movimiento
             nombre_anterior = producto.nombre
             categoria_anterior = producto.categoria
             proveedor_anterior = producto.proveedor
+            stock_anterior = producto.stock  # ← AGREGADO: Guardar stock anterior
 
-            # Capturar los datos enviados en la solicitud
             nombre = request.POST.get('nombre')
             categoria = request.POST.get('categoria')
             proveedor = request.POST.get('proveedor')
-            stock_str = request.POST.get('stock')   # Obtener como string
-            
+            stock_str = request.POST.get('stock')
 
             # Validar y convertir stock
             stock_nuevo = producto.stock
@@ -435,25 +433,25 @@ def modificarProducto(request, producto_id):
                 except ValueError:
                     return JsonResponse({'success': False, 'error': 'Stock inválido. Debe ser un número entero.'}, status=400)
 
-            # Actualizar los campos del producto si se proporcionan y son válidos
+            # Actualizar los campos del producto
             producto.nombre = nombre if nombre else producto.nombre
             producto.categoria = categoria if categoria else producto.categoria
             producto.proveedor = proveedor if proveedor else producto.proveedor
             producto.stock = stock_nuevo
 
-            # Guardar cambios en la base de datos
             producto.save()
 
-            # Registrar el movimiento de "modificación" en la tabla Movimiento
+            # Registrar el movimiento de "modificación"
             Movimiento.objects.create(
-                producto_id=producto.id, # Guarda el ID del producto
-                nombre_producto=nombre_anterior, # Nombre anterior del producto
-                categoria=categoria_anterior, # Categoría anterior
-                proveedor=proveedor_anterior, # Proveedor anterior
-                stock_nuevo=producto.stock, # Stock nuevo
-                accion="Modificación (Administrador)",  # Tipo de acción
-                usuario=request.user if request.user.is_authenticated else None, # Registrar el usuario
-                usuario_nombre=request.user.get_full_name() if request.user.is_authenticated else "Administrador", #
+                producto_id=producto.id,
+                nombre_producto=nombre_anterior,
+                categoria=categoria_anterior,
+                proveedor=proveedor_anterior,
+                stock_anterior=stock_anterior,  # ← AGREGADO: Ahora se guarda el stock anterior
+                stock_nuevo=producto.stock,
+                accion="Modificación (Administrador)",
+                usuario=request.user if request.user.is_authenticated else None,
+                usuario_nombre=request.user.get_full_name() if request.user.is_authenticated else "Administrador",
             )
 
             return JsonResponse({'success': True, 'message': 'Producto modificado correctamente.'})
@@ -464,7 +462,8 @@ def modificarProducto(request, producto_id):
         return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
 
 
-@Administrador_required # Solo accesible por 'Administrador'
+
+@Administrador_required
 def eliminarProducto(request, producto_id):
     """
     Vista para eliminar un producto del inventario.
@@ -474,18 +473,18 @@ def eliminarProducto(request, producto_id):
     
     # Registrar el movimiento de "eliminación" antes de eliminar el producto
     Movimiento.objects.create(
-        producto_id=producto.id, # Guarda el ID del producto
-        nombre_producto=producto.nombre, # Nombre del producto eliminado
+        producto_id=producto.id,
+        nombre_producto=producto.nombre,
         categoria=producto.categoria,
         proveedor=producto.proveedor,
-        stock_nuevo=0, # Stock después de la eliminación (0)
-        accion="Eliminación (Administrador)",  # Tipo de acción
-        cantidad_ajustada=-producto.stock, # Cantidad ajustada (total eliminado)
-        usuario=request.user if request.user.is_authenticated else None, # Registrar el usuario
+        stock_anterior=producto.stock,  # ← AGREGADO: Guardar el stock que tenía antes de eliminar
+        stock_nuevo=0,
+        accion="Eliminación (Administrador)",
+        cantidad_ajustada=-producto.stock,
+        usuario=request.user if request.user.is_authenticated else None,
         usuario_nombre=request.user.get_full_name() if request.user.is_authenticated else "Administrador",
     )
     
     producto.delete()
     messages.success(request, 'Producto eliminado exitosamente.')
     return HttpResponseRedirect(reverse('inventario'))
-
