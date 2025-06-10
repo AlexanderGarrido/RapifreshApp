@@ -5,12 +5,11 @@
 
 {% block content %} 
 <div class="container-fluid py-4">
-  <h1 class="text-center mb-5 text-primary">Bienvenido al Panel de Administración</h1> 
+  <h1 style="color: rgb(56, 68, 81);" class="text-center mb-5">Bienvenido al Panel de Administración</h1> 
   
   <hr class="my-5"> 
   
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center"> 
-    
     <div class="col d-flex">
       <div class="card w-100 shadow-sm border-0 rounded-3 text-center hover-lift" style="height: 320px;"> {# Añadido w-100 para asegurar el ancho completo de la columna #}
         <img src="{% static 'img/report.png' %}" class="card-img-top mx-auto mt-4" alt="Reportes" style="max-width: 120px; height: auto;"> 
@@ -19,7 +18,7 @@
           {# Manejo de desbordamiento de texto para que se ajuste a la altura fija de la tarjeta #}
           <p class="card-text text-muted small flex-grow-1 mb-3" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -line-clamp: 3; -webkit-box-orient: vertical;">Genera y visualiza reportes de movimientos de inventario.</p>
           <div class="w-100 mt-auto"> 
-            <a href="{% url 'reports' %}" class="btn btn-info w-100">Ver Reportes <i class="fas fa-arrow-right ms-2"></i></a> 
+            <a href="{% url 'reports' %}" style="background-color: rgb(39, 155, 39);" class="btn text-white w-100">Ver Reportes <i class="fas fa-arrow-right ms-2"></i></a> 
           </div>
         </div>
       </div>
@@ -33,7 +32,7 @@
           {# Manejo de desbordamiento de texto para que se ajuste a la altura fija de la tarjeta #}
           <p class="card-text text-muted small flex-grow-1 mb-3" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; line-clamp: 3; -webkit-box-orient: vertical;">Administra los usuarios del sistema y sus roles.</p>
           <div class="w-100 mt-auto"> 
-            <a href="{% url 'usuarios' %}" class="btn btn-warning w-100 text-dark">Administrar Usuarios <i class="fas fa-arrow-right ms-2"></i></a> 
+            <a href="{% url 'usuarios' %}" style="background-color: rgb(39, 155, 39);" class="btn w-100 text-white">Administrar Usuarios <i class="fas fa-arrow-right ms-2"></i></a> 
           </div>
         </div>
       </div>
@@ -47,7 +46,7 @@
           {# Manejo de desbordamiento de texto para que se ajuste a la altura fija de la tarjeta #}
           <p class="card-text text-muted small flex-grow-1 mb-3" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; line-clamp: 3; -webkit-box-orient: vertical;">Gestiona el stock de productos, precios y descripciones.</p>
           <div class="w-100 mt-auto"> 
-            <a href="{% url 'inventario' %}" class="btn btn-success w-100">Gestión de Inventario <i class="fas fa-arrow-right ms-2"></i></a> 
+            <a href="{% url 'inventario' %}"  style="background-color: rgb(39, 155, 39);" class="btn w-100 text-white">Gestión de Inventario <i class="fas fa-arrow-right ms-2"></i></a> 
           </div>
         </div>
       </div>
