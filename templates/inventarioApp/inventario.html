@@ -20,7 +20,7 @@
     <div class="d-flex flex-column flex-sm-row gap-2">
       <a href="{% url 'agregarProducto' %}" class="btn btn-success btn-lg"><i class="fa-solid fa-plus me-2"></i>Agregar Producto</a>
       <button id="exportPdfBtn" class="btn btn-danger btn-lg"><i class="fas fa-file-pdf me-2"></i>Exportar PDF</button>
-      <button id="exportExcelBtn" class="btn btn-success btn-lg"><i class="fas fa-file-excel me-2"></i>Exportar Excel</button>
+      <button id="exportExcelBtn" style="background-color: darkgreen;" class="btn btn-success btn-lg me-2"><i class="fas fa-file-excel me-2"></i>Exportar Excel</button>
     </div>
   </div>
 
@@ -124,12 +124,7 @@
           <div class="mb-3">
             <label for="editProductName" class="form-label">Nombre</label>
             <input type="text" class="form-control" id="editProductName" name="nombre" required>
-          </div>
-
-          <div class="mb-3">
-            <label for="editProductCategory" class="form-label">Categoría</label>
-            <input type="text" class="form-control" id="editProductCategory" name="categoria" required>
-          </div>          
+          </div>     
 
           <div class="mb-3">
             <label for="editProductSupplier" class="form-label">Proveedor</label>
