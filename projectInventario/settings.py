@@ -86,10 +86,10 @@ pymysql.install_as_MySQLdb()
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'inventariorapifresh',
-        'USER': 'root',
-        'PASSWORD': '', # ¡CAMBIAR EN PRODUCCIÓN!
-        'HOST': '127.0.0.1',
+        'NAME': 'rapifreshApp',
+        'USER': 'admin',
+        'PASSWORD': 'rapifresh1', # ¡CAMBIAR EN PRODUCCIÓN!
+        'HOST': 'database-rapifresh.c4ktyeloghnz.us-east-1.rds.amazonaws.com',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
