@@ -488,3 +488,8 @@ def eliminarProducto(request, producto_id):
     producto.delete()
     messages.success(request, 'Producto eliminado exitosamente.')
     return HttpResponseRedirect(reverse('inventario'))
+
+
+def galpon_view(request):
+    return render(request, 'inventarioApp/galpon.html')
+
