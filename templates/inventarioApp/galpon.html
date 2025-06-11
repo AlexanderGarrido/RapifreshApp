@@ -3,10 +3,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Galpón 3D ¡Funcionando!</title>
+  <title>Bodega 001</title>
   
-  <!-- PASO 1: EL MAPA DE IMPORTACIÓN -->
-  <!-- Esto le dice al navegador qué hacer cuando un script pide "three" -->
+  <!-- MAPA DE IMPORTACIÓN (SIN CAMBIOS) -->
   <script type="importmap">
   {
     "imports": {
@@ -16,29 +15,88 @@
   }
   </script>
 
+  <!-- === ESTILOS MEJORADOS === -->
   <style>
-    body { margin: 0; overflow: hidden; background-color: #111; }
-    canvas { display: block; }
-    #boton-inventario {
-      position: absolute; top: 20px; left: 20px; z-index: 10;
-      background-color: #007bff; color: white; padding: 12px 18px;
-      border: none; border-radius: 6px; font-size: 16px; cursor: pointer;
+    body { 
+      margin: 0; 
+      overflow: hidden; 
+      /* 1. Fondo amarillo pastel para toda la página */
+      background-color: #FFFACD; /* LemonChiffon, un amarillo muy claro */
+      font-family: sans-serif; /* Una fuente más legible */
+    }
+
+    canvas { 
+      display: block; 
+    }
+
+    /* 2. Título "Bodega001" */
+    #titulo-bodega {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%); /* Truco para centrarlo perfectamente */
+      z-index: 10;
+      color: #333; /* Un color de texto oscuro para que resalte */
+      font-size: 28px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2); /* Sombra para que se lea mejor */
+    }
+
+    /* Estilo base para ambos botones */
+    .boton-ui {
+      position: absolute;
+      top: 20px;
+      z-index: 10;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease; /* Efecto suave al pasar el mouse */
+    }
+    .boton-ui:hover {
+      transform: scale(1.05); /* Se agranda un poco al pasar el mouse */
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    /* 3. Botón "Gestionar Inventario" en verde */
+    #boton-gestionar {
+      left: 20px;
+      background-color: #28a745; /* Un verde bonito y claro */
+    }
+    
+    /* 4. Botón "Volver" */
+    #boton-volver {
+      right: 20px;
+      background-color: #6c757d; /* Un color gris neutral */
     }
   </style>
 </head>
 <body>
-  <button id="boton-inventario" onclick="window.location.href='/inventario'">Ir al Inventario</button>
 
-  <!-- PASO 2: EL SCRIPT PRINCIPAL (AHORA USA LOS NOMBRES CORTOS) -->
+  <!-- Elementos de la Interfaz (Título y Botones) -->
+  <h1 id="titulo-bodega">Bodega001</h1>
+  
+  <button id="boton-gestionar" class="boton-ui" onclick="window.location.href='/inventario'">
+    Gestionar Inventario
+  </button>
+  
+  <button id="boton-volver" class="boton-ui" onclick="window.location.href='/'">
+    Volver
+  </button>
+
+  <!-- SCRIPT PRINCIPAL (CON UN PEQUEÑO CAMBIO) -->
   <script type="module">
-    // Gracias al import map, ahora podemos usar los nombres cortos y limpios.
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-    // El resto del código es el mismo "a prueba de balas" que ya probamos
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87CEEB); 
+    
+    // 5. ¡IMPORTANTE! Cambiamos el fondo de la escena 3D para que coincida con el de la página
+    scene.background = new THREE.Color(0xFFFACD); 
 
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(3, 3, 5);
@@ -47,10 +105,10 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Un poco más de luz ambiente
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2); // Y direccional
     directionalLight.position.set(5, 10, 7.5);
     scene.add(directionalLight);
 
@@ -69,7 +127,7 @@
       model.scale.setScalar(scale);
       scene.add(model);
       controls.target.copy(model.position);
-      console.log("¡Galpón cargado y listo!");
+      console.log("¡Galpón cargado y listo para la gestión!");
     }, undefined, (error) => {
       console.error('Error final al cargar el modelo:', error);
     });
