@@ -9,57 +9,68 @@
   
   <hr class="my-5"> 
   
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center"> 
+  <!-- Grid responsivo: 1 columna en móvil, 2 en tablet, 3-4 en desktop -->
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4 justify-content-center"> 
+    
+    <!-- Card 1: Reportes -->
     <div class="col d-flex">
-      <div class="card w-100 shadow-sm border-0 rounded-3 text-center hover-lift" style="height: 320px;"> {# Añadido w-100 para asegurar el ancho completo de la columna #}
+      <div class="card w-100 shadow-sm border-0 rounded-3 text-center hover-lift" style="height: 320px;">
         <img src="{% static 'img/report.png' %}" class="card-img-top mx-auto mt-4" alt="Reportes" style="max-width: 120px; height: auto;"> 
         <div class="card-body d-flex flex-column align-items-center text-center"> 
           <h5 class="card-title fw-bold text-dark mt-2">Reportes</h5>
-          {# Manejo de desbordamiento de texto para que se ajuste a la altura fija de la tarjeta #}
-          <p class="card-text text-muted small flex-grow-1 mb-3" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -line-clamp: 3; -webkit-box-orient: vertical;">Genera y visualiza reportes de movimientos de inventario.</p>
+          <p class="card-text text-muted small flex-grow-1 mb-3 text-truncate-multiline">Genera y visualiza reportes de movimientos de inventario.</p>
           <div class="w-100 mt-auto"> 
-            <a href="{% url 'reports' %}" style="background-color: rgb(39, 155, 39);" class="btn text-white w-100">Ver Reportes <i class="fas fa-arrow-right ms-2"></i></a> 
+            <a href="{% url 'reports' %}" style="background-color: rgb(39, 155, 39);" class="btn text-white w-100">
+              Ver Reportes <i class="fas fa-arrow-right ms-2"></i>
+            </a> 
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Card 2: Usuarios -->
     <div class="col d-flex">
-      <div class="card w-100 shadow-sm border-0 rounded-3 text-center hover-lift" style="height: 320px;"> {# Añadido w-100 para asegurar el ancho completo de la columna #}
+      <div class="card w-100 shadow-sm border-0 rounded-3 text-center hover-lift" style="height: 320px;">
         <img src="{% static 'img/user.png' %}" class="card-img-top mx-auto mt-4" alt="Usuarios" style="max-width: 120px; height: auto;">
         <div class="card-body d-flex flex-column align-items-center text-center"> 
           <h5 class="card-title fw-bold text-dark mt-2">Usuarios</h5>
-          {# Manejo de desbordamiento de texto para que se ajuste a la altura fija de la tarjeta #}
-          <p class="card-text text-muted small flex-grow-1 mb-3" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; line-clamp: 3; -webkit-box-orient: vertical;">Administra los usuarios del sistema y sus roles.</p>
+          <p class="card-text text-muted small flex-grow-1 mb-3 text-truncate-multiline">Administra los usuarios del sistema y sus roles.</p>
           <div class="w-100 mt-auto"> 
-            <a href="{% url 'usuarios' %}" style="background-color: rgb(39, 155, 39);" class="btn w-100 text-white">Administrar Usuarios <i class="fas fa-arrow-right ms-2"></i></a> 
+            <a href="{% url 'usuarios' %}" style="background-color: rgb(39, 155, 39);" class="btn w-100 text-white">
+              Administrar Usuarios <i class="fas fa-arrow-right ms-2"></i>
+            </a> 
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Card 3: Inventario -->
     <div class="col d-flex">
-      <div class="card w-100 shadow-sm border-0 rounded-3 text-center hover-lift" style="height: 320px;"> {# Añadido w-100 para asegurar el ancho completo de la columna #}
+      <div class="card w-100 shadow-sm border-0 rounded-3 text-center hover-lift" style="height: 320px;">
         <img src="{% static 'img/inventario_icon.png' %}" class="card-img-top mx-auto mt-4 rounded-circle" alt="Inventario" style="max-width: 120px; height: auto;">
         <div class="card-body d-flex flex-column align-items-center text-center"> 
           <h5 class="card-title fw-bold text-dark mt-2">Inventario</h5>
-          {# Manejo de desbordamiento de texto para que se ajuste a la altura fija de la tarjeta #}
-          <p class="card-text text-muted small flex-grow-1 mb-3" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; line-clamp: 3; -webkit-box-orient: vertical;">Gestiona el stock de productos, precios y descripciones.</p>
+          <p class="card-text text-muted small flex-grow-1 mb-3 text-truncate-multiline">Gestiona el stock de productos, precios y descripciones.</p>
           <div class="w-100 mt-auto"> 
-            <a href="{% url 'inventario' %}"  style="background-color: rgb(39, 155, 39);" class="btn w-100 text-white">Gestión de Inventario <i class="fas fa-arrow-right ms-2"></i></a> 
+            <a href="{% url 'inventario' %}" style="background-color: rgb(39, 155, 39);" class="btn w-100 text-white">
+              Gestión de Inventario <i class="fas fa-arrow-right ms-2"></i>
+            </a> 
           </div>
         </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card w-100 shadow-sm border-0 rounded-3 text-center hover-lift" style="height: 320px;"> {# Añadido w-100 para asegurar el ancho completo de la columna #}
+
+    <!-- Card 4: Galpon -->
+    <div class="col d-flex">
+      <div class="card w-100 shadow-sm border-0 rounded-3 text-center hover-lift" style="height: 320px;">
         <img src="{% static 'img/galpon.jpg' %}" class="card-img-top mx-auto mt-4" alt="Galpon" style="max-width: 120px; height: auto;">
         <div class="card-body d-flex flex-column align-items-center text-center"> 
           <h5 class="card-title fw-bold text-dark mt-2">Galpon</h5>
-          {# Manejo de desbordamiento de texto para que se ajuste a la altura fija de la tarjeta #}
-          <p class="card-text text-muted small flex-grow-1 mb-3" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; line-clamp: 3; -webkit-box-orient: vertical;">Visualización del galpon 3D </p>
+          <p class="card-text text-muted small flex-grow-1 mb-3 text-truncate-multiline">Visualización del galpon 3D</p>
           <div class="w-100 mt-auto"> 
-            <a href="{% url 'galpon' %}"  style="background-color: rgb(39, 155, 39);" class="btn w-100 text-white">Gestión de Galpon <i class="fas fa-arrow-right ms-2"></i></a> 
+            <a href="{% url 'galpon' %}" style="background-color: rgb(39, 155, 39);" class="btn w-100 text-white">
+              Gestión de Galpon <i class="fas fa-arrow-right ms-2"></i>
+            </a> 
           </div>
         </div>
       </div>
@@ -67,11 +78,48 @@
 
   </div>
 </div>
+
 <style>
   .hover-lift:hover {
     transform: translateY(-5px);
     transition: transform 0.2s ease-in-out;
     box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+  }
+  
+  /* Mejorar el truncado de texto en múltiples líneas */
+  .text-truncate-multiline {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    line-height: 1.4;
+  }
+  
+  /* Responsividad adicional para pantallas muy pequeñas */
+  @media (max-width: 576px) {
+    .card {
+      height: auto !important;
+      min-height: 280px;
+    }
+    
+    .card-img-top {
+      max-width: 100px !important;
+    }
+  }
+  
+  /* Ajuste para tablets */
+  @media (min-width: 768px) and (max-width: 991px) {
+    .card {
+      height: 340px !important;
+    }
+  }
+  
+  /* Centrar las cards cuando son menos de 4 */
+  @media (min-width: 1200px) {
+    .row.justify-content-center {
+      justify-content: center !important;
+    }
   }
 </style>
 {% endblock %}
