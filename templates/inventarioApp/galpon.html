@@ -3,9 +3,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Bodega 001</title>
-  
-  <!-- MAPA DE IMPORTACIÓN (SIN CAMBIOS) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visor de Bodega 001 - Rapifresh</title>
+  <link rel="icon" href="{% static 'img/LogoRapifresh.avif' %}" type="image/avif">
+
+  <!-- Mapa de Importación (sin cambios) -->
   <script type="importmap">
   {
     "imports": {
@@ -15,121 +17,209 @@
   }
   </script>
 
-  <!-- === ESTILOS MEJORADOS === -->
+  <!-- === ESTILOS PROFESIONALES Y RESPONSIVE === -->
   <style>
-    body { 
-      margin: 0; 
-      overflow: hidden; 
-      /* 1. Fondo amarillo pastel para toda la página */
-      background-color: #FFFACD; /* LemonChiffon, un amarillo muy claro */
-      font-family: sans-serif; /* Una fuente más legible */
+    /* Reset y configuración base */
+    :root {
+      --primary-color: #2e5f86; /* Verde mar, un color corporativo y agradable */
+      --secondary-color: #2e5f86; /* Azul acero */
+      --light-background: #F0F8FF; /* AliceBlue, un fondo muy claro y profesional */
+      --dark-text: #333;
     }
 
-    canvas { 
-      display: block; 
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--light-background);
     }
 
-    /* 2. Título "Bodega001" */
-    #titulo-bodega {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%); /* Truco para centrarlo perfectamente */
-      z-index: 10;
-      color: #333; /* Un color de texto oscuro para que resalte */
-      font-size: 28px;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.2); /* Sombra para que se lea mejor */
+    /* Contenedor principal para usar Flexbox */
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
 
-    /* Estilo base para ambos botones */
-    .boton-ui {
-      position: absolute;
-      top: 20px;
-      z-index: 10;
-      color: white;
+    /* 1. Header Corporativo */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 12px 24px;
+      background-color: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      flex-shrink: 0; /* Evita que el header se encoja */
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .header-logo img {
+      height: 40px;
+      margin-right: 12px;
+    }
+
+    .header-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--dark-text);
+      margin: 0;
+    }
+
+    /* Contenedor para los botones del header */
+    .header-actions {
+      display: flex;
+      gap: 15px; /* Espacio entre botones */
+    }
+
+    /* 2. Botones Mejorados */
+    .btn-ui {
+      padding: 10px 20px;
+      font-size: 15px;
+      font-weight: bold;
+      color: white;
       border: none;
       border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
       cursor: pointer;
-      transition: all 0.2s ease; /* Efecto suave al pasar el mouse */
-    }
-    .boton-ui:hover {
-      transform: scale(1.05); /* Se agranda un poco al pasar el mouse */
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      display: flex; /* Para alinear íconos y texto si los añades */
+      align-items: center;
+      justify-content: center;
     }
 
-    /* 3. Botón "Gestionar Inventario" en verde */
-    #boton-gestionar {
-      left: 20px;
-      background-color: #28a745; /* Un verde bonito y claro */
+    .btn-ui:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 14px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.20);
     }
     
-    /* 4. Botón "Volver" */
-    #boton-volver {
-      right: 20px;
-      background-color: #6c757d; /* Un color gris neutral */
+    .btn-primary {
+      background-color: var(--primary-color);
     }
+    
+    .btn-secondary {
+      background-color: var(--secondary-color);
+    }
+
+    /* 3. Contenedor para la escena 3D */
+    .canvas-container {
+      flex-grow: 1; /* Ocupa todo el espacio restante */
+      position: relative; /* Necesario para el spinner de carga */
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* 4. Adaptabilidad para Teléfonos (Responsive Design) */
+    @media (max-width: 768px) {
+      .app-header {
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+      }
+
+      .header-title {
+        font-size: 20px;
+      }
+      
+      .btn-ui {
+        width: 100%; /* Botones ocupan todo el ancho */
+        padding: 12px;
+      }
+    }
+
   </style>
 </head>
 <body>
 
-  <!-- Elementos de la Interfaz (Título y Botones) -->
-  <h1 id="titulo-bodega">Bodega001</h1>
-  
-  <button id="boton-gestionar" class="boton-ui" onclick="window.location.href='/inventario'">
-    Gestionar Inventario
-  </button>
-  
-  <button id="boton-volver" class="boton-ui" onclick="window.location.href='/'">
-    Volver
-  </button>
+  <div class="main-container">
+    <!-- === HEADER === -->
+    <header class="app-header">
+      <div class="header-logo">
+        <img src="{% static 'img/LogoRapifresh.avif' %}" alt="Logo Rapifresh">
+        <h1 class="header-title">Bodega 001</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn-ui btn-primary" onclick="window.location.href='/inventario'">
+          Gestionar Inventario
+        </button>
+        <button class="btn-ui btn-secondary" onclick="window.location.href='/'">
+          Volver al Inicio
+        </button>
+      </div>
+    </header>
 
-  <!-- SCRIPT PRINCIPAL (CON UN PEQUEÑO CAMBIO) -->
+    <!-- === LIENZO 3D === -->
+    <div id="canvas-container" class="canvas-container">
+      <!-- El canvas se añadirá aquí por JavaScript -->
+    </div>
+  </div>
+
+  <!-- SCRIPT PRINCIPAL (con ajustes para el nuevo layout) -->
   <script type="module">
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-    const scene = new THREE.Scene();
-    
-    // 5. ¡IMPORTANTE! Cambiamos el fondo de la escena 3D para que coincida con el de la página
-    scene.background = new THREE.Color(0xFFFACD); 
+    // Apuntamos al nuevo contenedor del canvas
+    const container = document.getElementById('canvas-container');
 
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const scene = new THREE.Scene();
+    // Usamos el color de fondo definido en las variables CSS
+    scene.background = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--light-background')); 
+
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
     camera.position.set(3, 3, 5);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio); // Mejora la calidad en pantallas de alta resolución
+    container.appendChild(renderer.domElement);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Un poco más de luz ambiente
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2); // Y direccional
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
     directionalLight.position.set(5, 10, 7.5);
+    directionalLight.castShadow = true; // Sombras para más realismo
     scene.add(directionalLight);
-
+    
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
 
     const loader = new GLTFLoader();
     loader.load("{% static 'img/galpon.glb' %}", (gltf) => {
       const model = gltf.scene;
+      
       const box = new THREE.Box3().setFromObject(model);
-      const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
-      model.position.sub(center);
+      model.position.sub(center); 
+      
+      const size = box.getSize(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
       const scale = 5.0 / maxDim;
       model.scale.setScalar(scale);
+
       scene.add(model);
       controls.target.copy(model.position);
-      console.log("¡Galpón cargado y listo para la gestión!");
-    }, undefined, (error) => {
-      console.error('Error final al cargar el modelo:', error);
+    }, 
+    // Opcional: Mostrar progreso de carga
+    (xhr) => {
+      console.log((xhr.loaded / xhr.total * 100) + '% cargado');
+    }, 
+    (error) => {
+      console.error('Un error ocurrió al cargar el modelo', error);
     });
 
     function animate() {
@@ -139,10 +229,11 @@
     }
     animate();
 
+    // Ajustar el canvas si la ventana cambia de tamaño
     window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = container.clientWidth / container.clientHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(container.clientWidth, container.clientHeight);
     });
   </script>
 </body>

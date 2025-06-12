@@ -30,7 +30,7 @@ DEBUG = True # CAMBIAR A False EN PRODUCCIÓN
 # ALLOWED_HOSTS = [] # En desarrollo, puede estar vacío o ['127.0.0.1', 'localhost']
 # En producción, debe contener los nombres de dominio y/o IPs de tu servidor, ejemplo:
 # ALLOWED_HOSTS = ['tudominio.com', 'www.tudominio.com', 'tu_ip_servidor']
-ALLOWED_HOSTS = ['13.221.106.221', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
