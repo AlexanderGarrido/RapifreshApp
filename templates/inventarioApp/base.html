@@ -76,7 +76,7 @@
     <div class="container">
       <nav class="navbar navbar-expand-lg navbar-dark">
         <a class="navbar-brand fw-bold d-flex align-items-center" href="{% if request.user.is_authenticated and request.user.rol == 'Empleado' %}{% url 'inicioEmp' %}{% else %}{% url 'inicio' %}{% endif %}">
-          <img src="{% static 'img/logoRapifresh.avif' %}" alt="Logo Rapifresh" class="img-fluid me-2 main-brand-logo">
+          <img src="{% static 'img/LogoRapifresh.avif' %}" alt="Logo Rapifresh" class="img-fluid me-2 main-brand-logo">
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
